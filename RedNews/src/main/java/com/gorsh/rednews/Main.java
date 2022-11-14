@@ -6,8 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gorsh.rednews.telegram.WriteReadBot;
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -48,19 +52,30 @@ public class Main {
         System.setProperty("socksProxyHost", "proxy.orb.ru");
         System.setProperty("socksProxyPort", "3128");
 
-        TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-//        DefaultBotOptions botOptions = new DefaultBotOptions();
-//        botOptions.setProxyHost("proxy.orb.ru");
-//        botOptions.setProxyPort(3128);
-//        botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
-        WriteReadBot writeReadBot = new WriteReadBot();
-        telegramBotsApi.registerBot(writeReadBot);
+//        RestTemplate restTemplate = new RestTemplate();
+//        HttpHeaders headers = new HttpHeaders();
+//        HttpEntity<String> request = new HttpEntity<>(headers);
+//        ResponseEntity<String> response = restTemplate.postForEntity("https://api.telegram.org/bot5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g/getUpdates", request,  String.class);
+//        System.out.println(response.getBody());
+
+//        RestTemplate restTemplate = new RestTemplate();
+//        HttpHeaders headers = new HttpHeaders();
+//        MultiValueMap<String, String> body = new LinkedMultiValueMap<String, String>();
+//        body.add("chat_id", "457487030");
+//        body.add("text", "Hello");
+//        HttpEntity<Object> request = new HttpEntity<>(body, headers);
+//        ResponseEntity<String> response = restTemplate.postForEntity("https://api.telegram.org/bot5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g/sendMessage", request,  String.class);
+//        System.out.println(response.getBody());
 
 
 
-
-
-
+        try {
+            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+            botsApi.registerBot(new WriteReadBot());
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
@@ -85,7 +100,6 @@ public class Main {
 //        System.out.println(strReq);
 
 //        System.out.println(readArticles());
-    }
 
     public static String getAuthToken(){
         RestTemplate restTemplate = new RestTemplate();

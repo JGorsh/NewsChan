@@ -11,7 +11,7 @@ public class WriteReadBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "@RedditNewsChanelBot";
+        return "RedditNewsChanelBot";
     }
 
     @Override
@@ -32,13 +32,6 @@ public class WriteReadBot extends TelegramLongPollingBot {
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    public void executeWithExceptionCheck(SendMessage sendMessage) {
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
         }
     }
 }
