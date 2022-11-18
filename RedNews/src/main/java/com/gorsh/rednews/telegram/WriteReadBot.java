@@ -25,9 +25,9 @@ public class WriteReadBot extends TelegramLongPollingBot {
     private String subreddit;
     private String filter;
     boolean startWait = false;
-
+    
     boolean lentaLoop = false;
-
+    
     RedditService redditService;
 
     public WriteReadBot(DefaultBotOptions options) {
@@ -48,17 +48,25 @@ public class WriteReadBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
 
         SendMessage message = new SendMessage();
-        String command = update.getMessage().getText();
-        String chatId = update.getMessage().getChatId().toString();
-        message.setChatId(chatId);
+        String chatId = "";
+        if(update.hasMessage()){
+            chatId = update.getMessage().getChatId().toString();
+            message.setChatId(chatId);
+        }
+        if (update.hasCallbackQuery()){
+            chatId = update.getCallbackQuery().getMessage().getChatId().toString();
+            message.setChatId(chatId);
+        }
+
         redditService = new RedditService();
 
         if (update.hasMessage() && update.getMessage().hasText() && startWait == false) {
+            String command = update.getMessage().getText();
             if (command.equals("/start")) {
                 message.setText("Введите отслеживаемый subreddit ");
                 startWait = true; // Переменная = true в этом цикле она не будет false, а значит будет считка сообщения до тех пор, пока она снова не станет false
             }
-
+            
             if (command.equals("/stop")){
                 lentaLoop = false;
             }
@@ -67,28 +75,13 @@ public class WriteReadBot extends TelegramLongPollingBot {
                 lentaLoop = true;
                 while (lentaLoop){
                     sndMsgRdt(chatId, subreddit, filter);
+                    try {
+                        Thread.sleep(500000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 startWait = false; // Переменная = true в этом цикле она не будет false, а значит будет считка сообщения до тех пор, пока она снова не станет false
-            }
-
-            if (update.getCallbackQuery().getData().equals("new")){
-                filter = "new";
-                message.setText("Ваш отслеживаемый subreddit " + subreddit + "с фильтром new" + "\n" +
-                        "Для запуска ленты введите команду /run" + "\n" +
-                        "Для остановки ленты введите команду /stop");
-                startWait = false;
-            }
-
-            if (update.getCallbackQuery().getData().equals("hot")){
-                filter = "hot";
-                message.setText("Ваш отслеживаемый subreddit " + subreddit + "с фильтром hot");
-                startWait = false;
-            }
-
-            if (update.getCallbackQuery().getData().equals("top")){
-                filter = "top";
-                message.setText("Ваш отслеживаемый subreddit " + subreddit + "с фильтром top");
-                startWait = false;
             }
         }
         else if (update.hasMessage() && update.getMessage().hasText() && startWait == true) {
@@ -96,6 +89,32 @@ public class WriteReadBot extends TelegramLongPollingBot {
             message.setText("Выберите фильтр для "+update.getMessage().getText());
             message.setReplyMarkup(getInlineMessageButton());
             startWait = false; // "Считка" закончена
+        }
+
+        if (update.hasCallbackQuery() && startWait == false){
+            if (update.getCallbackQuery().getData().equals("new")){
+                filter = "new";
+                message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром new" + "\n" +
+                        "Для запуска ленты введите команду /run" + "\n" +
+                        "Для остановки ленты введите команду /stop");
+                startWait = false;
+            }
+
+            if (update.getCallbackQuery().getData().equals("hot")){
+                filter = "hot";
+                message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром hot" + "\n" +
+                        "Для запуска ленты введите команду /run" + "\n" +
+                        "Для остановки ленты введите команду /stop");
+                startWait = false;
+            }
+
+            if (update.getCallbackQuery().getData().equals("top")){
+                filter = "top";
+                message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром top" + "\n" +
+                        "Для запуска ленты введите команду /run" + "\n" +
+                        "Для остановки ленты введите команду /stop");
+                startWait = false;
+            }
         }
         try {
             execute(message); // Call method to send the message
@@ -133,7 +152,7 @@ public class WriteReadBot extends TelegramLongPollingBot {
         return inlineKeyboardMarkup;
     }
 
-
+    
     public void sndMsgRdt(String chatId, String subreddit, String filter){
 
         System.setProperty("https.proxyHost", "proxy.orb.ru");

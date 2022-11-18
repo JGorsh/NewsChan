@@ -45,7 +45,7 @@ public class RedditService {
         headers.setBearerAuth(authToken);
         headers.put("User-Agent", Collections.singletonList("myApp:V0.1"));
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-        String url = "https://oauth.reddit.com/r/" + subreddit + "/" + filter + "?limit=1";
+        String url = "https://oauth.reddit.com/r/" + subreddit + "/" + filter + "?limit=5";
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         return response.getBody();
