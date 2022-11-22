@@ -1,11 +1,15 @@
 package com.gorsh.rednews.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "channelReddit")
 public class ChannelReddit {
@@ -22,27 +26,4 @@ public class ChannelReddit {
     @JoinColumn(name = "messageId")
     private List<TelegramMessage> channels = new ArrayList<>();
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getChannelName() {
-        return channelName;
-    }
-
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
-    }
-
-    public List<TelegramMessage> getChannels() {
-        return channels;
-    }
-
-    public void setChannels(List<TelegramMessage> channels) {
-        this.channels = channels;
-    }
 }

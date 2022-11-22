@@ -1,10 +1,13 @@
 package com.gorsh.rednews.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
-
+@Getter
+@Setter
 @Entity
 @Table(name = "telegramMessage")
 public class TelegramMessage {
@@ -26,43 +29,4 @@ public class TelegramMessage {
     @Column
     private String urlMedia;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getSubreddit() {
-        return subreddit;
-    }
-
-    public void setSubreddit(String subreddit) {
-        this.subreddit = subreddit;
-    }
-
-    public String getUrlPost() {
-        return urlPost;
-    }
-
-    public void setUrlPost(String urlPost) {
-        this.urlPost = urlPost;
-    }
-
-    public String getUrlMedia() {
-        return urlMedia;
-    }
-
-    public void setUrlMedia(String urlMedia) {
-        this.urlMedia = urlMedia;
-    }
 }

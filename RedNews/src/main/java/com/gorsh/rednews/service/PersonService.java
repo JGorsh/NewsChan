@@ -13,12 +13,9 @@ import javax.inject.Inject;
 @Service
 public class PersonService {
 
-    PersonRepository personRepository;
-
     @Autowired
-    public PersonService (PersonRepository personRepository){
-        this.personRepository = personRepository;
-    }
+    PersonRepository personRepository;
+    
 
     public Person save(Person person) {
         return personRepository.save(person);
