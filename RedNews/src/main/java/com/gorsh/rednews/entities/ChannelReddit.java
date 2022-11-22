@@ -11,8 +11,9 @@ import java.util.List;
 public class ChannelReddit {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
-    private String id;
+    private Long id;
 
     @Column
     private String channelName;
@@ -21,11 +22,11 @@ public class ChannelReddit {
     @JoinColumn(name = "messageId")
     private List<TelegramMessage> channels = new ArrayList<>();
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 

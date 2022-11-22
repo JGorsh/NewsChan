@@ -13,13 +13,13 @@ public class BotRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-        DefaultBotOptions botOptions = new DefaultBotOptions();
-        botOptions.setProxyHost("proxy.orb.ru");
-        botOptions.setProxyPort(3128);
-        botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
-        WriteReadBot bot = new WriteReadBot(botOptions);
-        botsApi.registerBot(bot);
+//        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+//        DefaultBotOptions botOptions = new DefaultBotOptions();
+//        botOptions.setProxyHost("proxy.orb.ru");
+//        botOptions.setProxyPort(3128);
+//        botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
+//        WriteReadBot bot = new WriteReadBot(botOptions);
+//        botsApi.registerBot(bot);
 
     }
 }

@@ -6,23 +6,31 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gorsh.rednews.entities.Person;
-import com.gorsh.rednews.service.PersonServiceImpl;
+import com.gorsh.rednews.repository.PersonRepository;
+import com.gorsh.rednews.service.PersonService;
 import com.gorsh.rednews.service.RedditService;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor
+//@Getter
+//@Setter
+@Component
 public class WriteReadBot extends TelegramLongPollingBot {
 
     private String subreddit;
@@ -30,11 +38,16 @@ public class WriteReadBot extends TelegramLongPollingBot {
     boolean startWait = false;
     
     boolean lentaLoop = false;
-    
+
+
+    Person person;
+
+
     RedditService redditService;
 
     @Autowired
-    PersonServiceImpl personServiceImpl;
+    PersonService personService ;
+
     public WriteReadBot(DefaultBotOptions options) {
         super(options);
     }
@@ -52,7 +65,6 @@ public class WriteReadBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
 
-        Person person;
         SendMessage message = new SendMessage();
         String chatId = "";
         if(update.hasMessage()){
@@ -60,7 +72,8 @@ public class WriteReadBot extends TelegramLongPollingBot {
             chatId = update.getMessage().getChatId().toString();
             person.setChatId(chatId);
             person.setName(update.getMessage().getChat().getUserName());
-            personServiceImpl.save(person);
+            personService.save(person);
+            System.out.println(person.getChatId() + " " + person.getName());
             message.setChatId(chatId);
         }
         if (update.hasCallbackQuery()){

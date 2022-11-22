@@ -1,4 +1,4 @@
 package com.gorsh.rednews.service;
 
-public interface ChannelRedditService {
+public class ChannelRedditService {
 }

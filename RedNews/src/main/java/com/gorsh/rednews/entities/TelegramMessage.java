@@ -10,8 +10,9 @@ import javax.persistence.*;
 public class TelegramMessage {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
-    private String id;
+    private Long id;
 
     @Column
     private String title;
@@ -25,11 +26,11 @@ public class TelegramMessage {
     @Column
     private String urlMedia;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
