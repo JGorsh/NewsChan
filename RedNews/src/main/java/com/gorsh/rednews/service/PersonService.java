@@ -2,10 +2,7 @@ package com.gorsh.rednews.service;
 
 import com.gorsh.rednews.entities.Person;
 import com.gorsh.rednews.repository.PersonRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

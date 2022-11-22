@@ -20,7 +20,10 @@ public class ChannelReddit {
     private Long id;
 
     @Column
-    private String channelName;
+    private String subreddit;
+
+    @Column
+    private String channelFilter;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "messageId")

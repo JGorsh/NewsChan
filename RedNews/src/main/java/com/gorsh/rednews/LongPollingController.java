@@ -1,7 +1,9 @@
 package com.gorsh.rednews;
 
 import com.gorsh.rednews.entities.Person;
+import com.gorsh.rednews.service.ChannelRedditService;
 import com.gorsh.rednews.service.PersonService;
+import com.gorsh.rednews.service.TelegramMessageService;
 import com.gorsh.rednews.telegram.WriteReadBot;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,12 @@ public class LongPollingController {
 
     @Autowired
     PersonService personService;
+
+    @Autowired
+    ChannelRedditService channelRedditService;
+
+    @Autowired
+    TelegramMessageService telegramMessageService;
 
     private final WriteReadBot writeReadBot;
 

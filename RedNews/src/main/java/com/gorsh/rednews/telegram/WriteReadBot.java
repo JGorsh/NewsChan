@@ -5,10 +5,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gorsh.rednews.entities.ChannelReddit;
 import com.gorsh.rednews.entities.Person;
-import com.gorsh.rednews.repository.PersonRepository;
+import com.gorsh.rednews.entities.TelegramMessage;
+import com.gorsh.rednews.service.ChannelRedditService;
 import com.gorsh.rednews.service.PersonService;
 import com.gorsh.rednews.service.RedditService;
+import com.gorsh.rednews.service.TelegramMessageService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,10 +42,20 @@ public class WriteReadBot extends TelegramLongPollingBot {
 
     Person person;
 
+    ChannelReddit channelReddit;
+
+    TelegramMessage telegramMessage;
+
     RedditService redditService;
 
     @Autowired
     PersonService personService ;
+
+//    @Autowired
+//    TelegramMessageService telegramMessageService;
+//
+//    @Autowired
+//    ChannelRedditService channelRedditService;
 
     public WriteReadBot(DefaultBotOptions options) {
         super(options);
@@ -116,6 +129,8 @@ public class WriteReadBot extends TelegramLongPollingBot {
                 message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром new" + "\n" +
                         "Для запуска ленты введите команду /run" + "\n" +
                         "Для остановки ленты введите команду /stop");
+                channelReddit.setSubreddit(subreddit);
+                channelReddit.setChannelFilter("new");
                 startWait = false;
             }
 
@@ -124,6 +139,8 @@ public class WriteReadBot extends TelegramLongPollingBot {
                 message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром hot" + "\n" +
                         "Для запуска ленты введите команду /run" + "\n" +
                         "Для остановки ленты введите команду /stop");
+                channelReddit.setSubreddit(subreddit);
+                channelReddit.setChannelFilter("hot");
                 startWait = false;
             }
 
@@ -132,6 +149,8 @@ public class WriteReadBot extends TelegramLongPollingBot {
                 message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром top" + "\n" +
                         "Для запуска ленты введите команду /run" + "\n" +
                         "Для остановки ленты введите команду /stop");
+                channelReddit.setSubreddit(subreddit);
+                channelReddit.setChannelFilter("top");
                 startWait = false;
             }
         }
