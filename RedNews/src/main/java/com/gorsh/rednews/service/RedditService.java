@@ -2,15 +2,14 @@ package com.gorsh.rednews.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gorsh.rednews.entities.ChannelReddit;
 import org.jvnet.hk2.annotations.Service;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class RedditService {
@@ -38,16 +37,22 @@ public class RedditService {
         return String.valueOf(map.get("access_token"));
     }
 
-    public String readArticles(String authToken, String subreddit, String filter) {
+    public List<String> readArticles(String authToken, List<ChannelReddit> subreddits, String filter) {
+        List<String> bodyResponseList = new ArrayList<>();
+        ResponseEntity<String> response;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(authToken);
         headers.put("User-Agent", Collections.singletonList("myApp:V0.1"));
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-        String url = "https://oauth.reddit.com/r/" + subreddit + "/" + filter + "?limit=5";
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        for(ChannelReddit ch : subreddits){
+            String url = "https://oauth.reddit.com/r/" + ch.getSubreddit() + "/" + filter + "?limit=1";
+            response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            bodyResponseList.add(response.getBody());
+        }
 
-        return response.getBody();
+
+        return bodyResponseList;
     }
 }

@@ -51,11 +51,8 @@ public class WriteReadBot extends TelegramLongPollingBot {
     @Autowired
     PersonService personService ;
 
-//    @Autowired
-//    TelegramMessageService telegramMessageService;
-//
-//    @Autowired
-//    ChannelRedditService channelRedditService;
+    List<ChannelReddit> subreddits = new ArrayList<>();
+
 
     public WriteReadBot(DefaultBotOptions options) {
         super(options);
@@ -75,13 +72,14 @@ public class WriteReadBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
 
         SendMessage message = new SendMessage();
+        person  = new Person();
+
+        telegramMessage = new TelegramMessage();
         String chatId = "";
         if(update.hasMessage()){
-            person  = new Person();
             chatId = update.getMessage().getChatId().toString();
             person.setChatId(chatId);
             person.setName(update.getMessage().getChat().getUserName());
-            personService.save(person);
             System.out.println(person.getChatId() + " " + person.getName());
             message.setChatId(chatId);
         }
@@ -91,6 +89,7 @@ public class WriteReadBot extends TelegramLongPollingBot {
         }
 
         redditService = new RedditService();
+        channelReddit = new ChannelReddit();
 
         if (update.hasMessage() && update.getMessage().hasText() && startWait == false) {
             String command = update.getMessage().getText();
@@ -105,19 +104,24 @@ public class WriteReadBot extends TelegramLongPollingBot {
 
             if (command.equals("/run")) {
                 lentaLoop = true;
-                while (lentaLoop){
-                    sndMsgRdt(chatId, subreddit, filter);
+                //while (lentaLoop){
+                    sndMsgRdt(chatId, subreddits, filter);
                     try {
                         Thread.sleep(500000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                }
+                //}
                 startWait = false; // Переменная = true в этом цикле она не будет false, а значит будет считка сообщения до тех пор, пока она снова не станет false
+            }
+            if (command.equals("/update")){
+                message.setText("Введите новый отслеживаемый subreddit ");
+                startWait = true;
             }
         }
         else if (update.hasMessage() && update.getMessage().hasText() && startWait == true) {
             subreddit =update.getMessage().getText();
+            channelReddit.setSubreddit(subreddit);
             message.setText("Выберите фильтр для "+update.getMessage().getText());
             message.setReplyMarkup(getInlineMessageButton());
             startWait = false; // "Считка" закончена
@@ -126,31 +130,45 @@ public class WriteReadBot extends TelegramLongPollingBot {
         if (update.hasCallbackQuery() && startWait == false){
             if (update.getCallbackQuery().getData().equals("new")){
                 filter = "new";
+                channelReddit.setChannelFilter(filter);
+                subreddits.add(channelReddit);
                 message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром new" + "\n" +
                         "Для запуска ленты введите команду /run" + "\n" +
                         "Для остановки ленты введите команду /stop");
                 channelReddit.setSubreddit(subreddit);
                 channelReddit.setChannelFilter("new");
+                subreddits.add(channelReddit);
+                person.setSubreddits(subreddits);
+
+                personService.save(person);
                 startWait = false;
             }
 
             if (update.getCallbackQuery().getData().equals("hot")){
                 filter = "hot";
+                channelReddit.setChannelFilter(filter);
+                subreddits.add(channelReddit);
                 message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром hot" + "\n" +
                         "Для запуска ленты введите команду /run" + "\n" +
                         "Для остановки ленты введите команду /stop");
                 channelReddit.setSubreddit(subreddit);
                 channelReddit.setChannelFilter("hot");
+                subreddits.add(channelReddit);
+                person.setSubreddits(subreddits);
                 startWait = false;
             }
 
             if (update.getCallbackQuery().getData().equals("top")){
                 filter = "top";
+                channelReddit.setChannelFilter(filter);
+                subreddits.add(channelReddit);
                 message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром top" + "\n" +
                         "Для запуска ленты введите команду /run" + "\n" +
                         "Для остановки ленты введите команду /stop");
                 channelReddit.setSubreddit(subreddit);
                 channelReddit.setChannelFilter("top");
+                subreddits.add(channelReddit);
+                person.setSubreddits(subreddits);
                 startWait = false;
             }
         }
@@ -191,7 +209,7 @@ public class WriteReadBot extends TelegramLongPollingBot {
     }
 
     
-    public void sndMsgRdt(String chatId, String subreddit, String filter){
+    public void sndMsgRdt(String chatId, List<ChannelReddit> subreddits, String filter){
 
         System.setProperty("https.proxyHost", "proxy.orb.ru");
         System.setProperty("https.proxyPort", "3128");
@@ -214,14 +232,16 @@ public class WriteReadBot extends TelegramLongPollingBot {
 //        Long chatId = 457487030L;
 //        Long chatIdNast = 393135248L;
         try {
-                JsonNode node = mapper.readTree(redditService.readArticles(redditService.getAuthToken(), subreddit, filter)).get("data").get("children");
+            List<String> resultResponseList = redditService.readArticles(redditService.getAuthToken(), subreddits, filter);
+            for(String resultResponse : resultResponseList) {
+                JsonNode node = mapper.readTree(resultResponse).get("data").get("children");
                 SendMessage message = new SendMessage();
                 message.setChatId(chatId.toString());
                 if (node.isArray()) {
                     for (final JsonNode objNode : node) {
                         boolean isVideo = Boolean.valueOf((objNode.get("data").get("is_video").asText()));
 
-                        if(isVideo){
+                        if (isVideo) {
                             message.setText(objNode.get("data").get("title").asText()
                                     + "\n\n"
                                     + objNode.get("data").get("media").get("reddit_video").get("fallback_url").asText()
@@ -232,8 +252,7 @@ public class WriteReadBot extends TelegramLongPollingBot {
                             System.out.println(objNode.get("data").get("title").asText());
                             System.out.println(objNode.get("data").get("media").get("reddit_video").get("fallback_url").asText());
                             System.out.println("reddit.com" + objNode.get("data").get("permalink").asText());
-                        }
-                        else {
+                        } else {
                             message.setText(objNode.get("data").get("title").asText()
                                     + "\n\n"
                                     + objNode.get("data").get("url").asText()
@@ -247,15 +266,16 @@ public class WriteReadBot extends TelegramLongPollingBot {
                         }
                     }
                 }
-        //        Thread.sleep(600000);
-
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
+                //        Thread.sleep(600000);
+            }
+            } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         } catch (JsonMappingException e) {
             throw new RuntimeException(e);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+
 
     }
 //    public void sendMsg (SendMessage message, String text) {

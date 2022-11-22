@@ -26,8 +26,8 @@ public class Person implements Serializable {
     @Column
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "channelRedditId")
-    private List<ChannelReddit> channels = new ArrayList<>();
+    private List<ChannelReddit> subreddits = new ArrayList<>();
 
 }

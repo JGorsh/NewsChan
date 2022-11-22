@@ -21,9 +21,6 @@ public class TelegramMessage {
     private String title;
 
     @Column
-    private String subreddit;
-
-    @Column
     private String urlPost;
 
     @Column
