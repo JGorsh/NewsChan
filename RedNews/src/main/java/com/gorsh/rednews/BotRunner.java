@@ -1,11 +1,7 @@
 package com.gorsh.rednews;
 
-import com.gorsh.rednews.telegram.WriteReadBot;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.DefaultBotOptions;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @Component
 public class BotRunner implements CommandLineRunner {

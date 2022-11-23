@@ -1,6 +1,6 @@
 package com.gorsh.rednews.appconfig;
 
-import com.gorsh.rednews.telegram.WriteReadBot;
+import com.gorsh.rednews.telegram.MyTelegramBot;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,7 +20,7 @@ public class BotConfig {
     private DefaultBotOptions.ProxyType proxyType;
 
     @Bean
-    public WriteReadBot myTelegramBot() {
+    public MyTelegramBot myTelegramBot() {
         TelegramBotsApi botsApi = null;
         try {
             botsApi = new TelegramBotsApi(DefaultBotSession.class);
@@ -33,7 +33,7 @@ public class BotConfig {
         botOptions.setProxyPort(3128);
         botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
 
-        WriteReadBot myTelegramBot = new WriteReadBot(botOptions);
+        MyTelegramBot myTelegramBot = new MyTelegramBot(botOptions);
         try {
             botsApi.registerBot(myTelegramBot);
         } catch (TelegramApiException e) {

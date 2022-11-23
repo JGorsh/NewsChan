@@ -24,7 +24,10 @@ public class Person implements Serializable {
     private String chatId;
 
     @Column
-    private String name;
+    private Long userId;
+
+    @Column
+    private String userName;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "channelRedditId")
