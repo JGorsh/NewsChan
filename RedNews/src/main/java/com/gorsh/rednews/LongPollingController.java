@@ -3,7 +3,7 @@ package com.gorsh.rednews;
 import com.gorsh.rednews.service.ChannelRedditService;
 import com.gorsh.rednews.service.PersonService;
 import com.gorsh.rednews.service.TelegramMessageService;
-import com.gorsh.rednews.telegram.MyTelegramBot;
+import com.gorsh.rednews.telegram.MyBotTelegram;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,15 +23,15 @@ public class LongPollingController {
     @Autowired
     TelegramMessageService telegramMessageService;
 
-    private final MyTelegramBot myTelegramBot;
+    private final MyBotTelegram myBotTelegram;
 
-    public LongPollingController(MyTelegramBot myTelegramBot) {
-        this.myTelegramBot = myTelegramBot;
+    public LongPollingController(MyBotTelegram myBotTelegram) {
+        this.myBotTelegram = myBotTelegram;
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public void onUpdateReceived(@RequestBody Update update) {
-       myTelegramBot.onUpdateReceived(update);
+       myBotTelegram.onUpdateReceived(update);
     }
 
 }

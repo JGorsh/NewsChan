@@ -5,6 +5,8 @@ import com.gorsh.rednews.repository.ChannelRedditRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ChannelRedditService {
 
@@ -13,5 +15,9 @@ public class ChannelRedditService {
 
     public ChannelReddit save(ChannelReddit channelReddit) {
         return channelRedditRepository.save(channelReddit);
+    }
+
+    public List<ChannelReddit> getAll (){
+        return channelRedditRepository.findAll();
     }
 }
