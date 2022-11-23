@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gorsh.rednews.entities.ChannelReddit;
 import com.gorsh.rednews.entities.Person;
 import com.gorsh.rednews.entities.TelegramMessage;
+import com.gorsh.rednews.service.ChannelRedditService;
 import com.gorsh.rednews.service.PersonService;
 import com.gorsh.rednews.reddit.RedditService;
 import lombok.Getter;
@@ -51,6 +52,9 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     @Autowired
     PersonService personService ;
 
+    @Autowired
+    ChannelRedditService channelRedditService;
+
     private List<ChannelReddit> subreddits = new ArrayList<>();
 
 
@@ -71,7 +75,92 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
 
-//
+        SendMessage message = new SendMessage();
+        String chatId = "";
+        Long userId;
+        String userName;
+        if(update.hasMessage()){
+            person  = new Person();
+            chatId = update.getMessage().getChatId().toString();
+            userId = update.getMessage().getFrom().getId();
+            userName = update.getMessage().getFrom().getUserName();
+            person.setChatId(chatId);
+            person.setUserId(userId);
+            person.setUserName(userName);
+            //personService.save(person);
+            System.out.println(person.getChatId() + " " + person.getUserName());
+            message.setChatId(chatId);
+        }
+        if (update.hasCallbackQuery()){
+            chatId = update.getCallbackQuery().getMessage().getChatId().toString();
+            message.setChatId(chatId);
+        }
+
+        redditService = new RedditService();
+
+        if (update.hasMessage() && update.getMessage().hasText() && startWait == false) {
+            String command = update.getMessage().getText();
+            if (command.equals("/start")) {
+                message.setText("Введите отслеживаемый subreddit ");
+                startWait = true; // Переменная = true в этом цикле она не будет false, а значит будет считка сообщения до тех пор, пока она снова не станет false
+            }
+
+            if (command.equals("/stop")){
+                lentaLoop = false;
+            }
+
+            if (command.equals("/run")) {
+                lentaLoop = true;
+                    sndMsgRdt(chatId, subreddits);
+                startWait = false; // Переменная = true в этом цикле она не будет false, а значит будет считка сообщения до тех пор, пока она снова не станет false
+            }
+        }
+        else if (update.hasMessage() && update.getMessage().hasText() && startWait == true) {
+            subreddit =update.getMessage().getText();
+            message.setText("Выберите фильтр для "+update.getMessage().getText());
+            message.setReplyMarkup(getInlineMessageButton());
+            startWait = false; // "Считка" закончена
+        }
+
+        if (update.hasCallbackQuery() && startWait == false){
+            if (update.getCallbackQuery().getData().equals("new")){
+                filter = "new";
+                message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром new" + "\n" +
+                        "Для запуска ленты введите команду /run" + "\n" +
+                        "Для остановки ленты введите команду /stop");
+                channelReddit.setSubreddit(subreddit);
+                channelReddit.setChannelFilter("new");
+                subreddits.add(channelReddit);
+                person.setSubreddits(subreddits);
+                personService.save(person);
+                startWait = false;
+            }
+
+            if (update.getCallbackQuery().getData().equals("hot")){
+                filter = "hot";
+                message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром hot" + "\n" +
+                        "Для запуска ленты введите команду /run" + "\n" +
+                        "Для остановки ленты введите команду /stop");
+                channelReddit.setSubreddit(subreddit);
+                channelReddit.setChannelFilter("hot");
+                startWait = false;
+            }
+
+            if (update.getCallbackQuery().getData().equals("top")){
+                filter = "top";
+                message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром top" + "\n" +
+                        "Для запуска ленты введите команду /run" + "\n" +
+                        "Для остановки ленты введите команду /stop");
+                channelReddit.setSubreddit(subreddit);
+                channelReddit.setChannelFilter("top");
+                startWait = false;
+            }
+        }
+        try {
+            execute(message); // Call method to send the message
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 
     private InlineKeyboardMarkup getInlineMessageButton(){
@@ -104,7 +193,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     }
 
     
-    public void sndMsgRdt(String chatId, List<ChannelReddit> subreddits, String filter){
+    public void sndMsgRdt(String chatId, List<ChannelReddit> subreddits){
 
         System.setProperty("https.proxyHost", "proxy.orb.ru");
         System.setProperty("https.proxyPort", "3128");
@@ -123,9 +212,9 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 //        HttpEntity<Object> request = new HttpEntity<>(body, headers);
 //        ResponseEntity<String> response = restTemplate.postForEntity("https://api.telegram.org/bot5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g/sendMessage", request,  String.class);
 //        System.out.println(response.getBody());
-        ObjectMapper mapper= new ObjectMapper();
 //        Long chatId = 457487030L;
 //        Long chatIdNast = 393135248L;
+        ObjectMapper mapper= new ObjectMapper();
         try {
             List<String> resultResponseList = redditService.readArticles(redditService.getAuthToken(), subreddits);
             for(String resultResponse : resultResponseList) {

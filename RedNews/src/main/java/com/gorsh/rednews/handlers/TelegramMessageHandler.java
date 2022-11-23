@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gorsh.rednews.entities.TelegramMessage;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 //маппинг списка ответов сабреддита и сохранение в бд
+
+@Component
 public class TelegramMessageHandler {
 
     private List<TelegramMessage> telegramMessageList;
