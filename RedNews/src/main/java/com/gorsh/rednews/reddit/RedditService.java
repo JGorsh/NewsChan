@@ -60,8 +60,7 @@ public class RedditService implements Runnable{
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = new HashMap<>();
         try {
-            map.putAll(mapper
-                    .readValue(response.getBody(), new TypeReference<Map<String,Object>>(){}));
+            map.putAll(mapper.readValue(response.getBody(), new TypeReference<Map<String,Object>>(){}));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -78,17 +77,19 @@ public class RedditService implements Runnable{
         headers.setBearerAuth(authToken);
         headers.put("User-Agent", Collections.singletonList("myApp:V0.1"));
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-        for(ChannelReddit ch : subreddits){
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
-            String url = "https://oauth.reddit.com/r/" + ch.getSubreddit() + "/" + ch.getChannelFilter() + "?limit=1";
-            System.out.println("readReddit");
-            response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            bodyResponseList.add(response.getBody());
+        if (subreddits!=null){
+            for(ChannelReddit ch : subreddits){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+                String url = "https://oauth.reddit.com/r/" + ch.getSubreddit() + "/" + ch.getChannelFilter() + "?limit=1";
+                System.out.println("readReddit");
+                response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+                bodyResponseList.add(response.getBody());
 
+            }
         }
         return bodyResponseList;
     }

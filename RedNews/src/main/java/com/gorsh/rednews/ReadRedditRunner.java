@@ -21,6 +21,9 @@ public class ReadRedditRunner implements CommandLineRunner{
 //        WriteReadBot bot = new WriteReadBot(botOptions);
 //        botsApi.registerBot(bot);
 
+        System.setProperty("https.proxyHost", "proxy.orb.ru");
+        System.setProperty("https.proxyPort", "3128");
+
         Thread thread = new Thread(redditService);
         thread.start();
     }

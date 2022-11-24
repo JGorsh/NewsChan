@@ -197,8 +197,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
     public void sndMsgRdt(String chatId) {
 
-        System.setProperty("https.proxyHost", "proxy.orb.ru");
-        System.setProperty("https.proxyPort", "3128");
+
 
 //        RestTemplate restTemplate = new RestTemplate();
 //        HttpHeaders headers = new HttpHeaders();
