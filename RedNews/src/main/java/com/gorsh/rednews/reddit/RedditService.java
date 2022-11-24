@@ -16,13 +16,13 @@ public class RedditService {
     public String getAuthToken(){
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth("reddit.clientId", "reddit.secret");
+        headers.setBasicAuth("YIs2-_3udGw-RmaGqkj94w", "Gm2TKpV2_YZLWcBU-oh6l44vRiHj-w");
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.put("User-Agent", Collections.singletonList("myApp:V0.1"));
 
         String body = "grant_type=client_credentials";
         HttpEntity<String> request = new HttpEntity<>(body, headers);
-        String authUrl = "reddit.accsessTokenUrl";
+        String authUrl = "https://www.reddit.com/api/v1/access_token";
         ResponseEntity<String> response = restTemplate.postForEntity(authUrl, request, String.class);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -47,14 +47,15 @@ public class RedditService {
         headers.put("User-Agent", Collections.singletonList("myApp:V0.1"));
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         for(ChannelReddit ch : subreddits){
-            String url = "reddit.requestUrl" + ch.getSubreddit() + "/" + ch.getChannelFilter() + "reddit.limit";
-            response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            bodyResponseList.add(response.getBody());
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            String url = "https://oauth.reddit.com/r/" + ch.getSubreddit() + "/" + ch.getChannelFilter() + "?limit=1";
+            response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            bodyResponseList.add(response.getBody());
+
         }
         return bodyResponseList;
     }

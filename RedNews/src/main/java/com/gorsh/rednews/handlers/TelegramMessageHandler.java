@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gorsh.rednews.entities.TelegramMessage;
+import com.gorsh.rednews.service.TelegramMessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -18,6 +20,9 @@ public class TelegramMessageHandler {
     private List<TelegramMessage> telegramMessageList;
 
     private TelegramMessage telegramMessage;
+
+    @Autowired
+    TelegramMessageService telegramMessageService;
 
     public List<TelegramMessage> telegramMessageMarshaling (List<String> resultResponseList){
 
@@ -37,6 +42,7 @@ public class TelegramMessageHandler {
                             telegramMessage.setUrlMedia(objNode.get("data").get("media").get("reddit_video").get("fallback_url").asText());
                             telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
                             telegramMessageList.add(telegramMessage);
+                            //telegramMessageService.save(telegramMessage);
 
                             System.out.println(objNode.get("data").get("title").asText());
                             System.out.println(objNode.get("data").get("media").get("reddit_video").get("fallback_url").asText());
@@ -46,6 +52,7 @@ public class TelegramMessageHandler {
                             telegramMessage.setUrlMedia(objNode.get("data").get("url").asText());
                             telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
                             telegramMessageList.add(telegramMessage);
+                            //telegramMessageService.save(telegramMessage);
 
                             System.out.println(objNode.get("data").get("title").asText());
                             System.out.println(objNode.get("data").get("url").asText());

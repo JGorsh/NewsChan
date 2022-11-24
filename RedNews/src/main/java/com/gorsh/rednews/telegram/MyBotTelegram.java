@@ -8,6 +8,7 @@ import com.gorsh.rednews.handlers.TelegramMessageHandler;
 import com.gorsh.rednews.service.ChannelRedditService;
 import com.gorsh.rednews.service.PersonService;
 import com.gorsh.rednews.reddit.RedditService;
+import com.gorsh.rednews.service.TelegramMessageService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -55,8 +56,10 @@ public class MyBotTelegram extends TelegramLongPollingBot {
     @Autowired
     TelegramMessageHandler telegramMessageHandler;
 
-    private List<ChannelReddit> subreddits = new ArrayList<>();
+    @Autowired
+    TelegramMessageService telegramMessageService;
 
+    private List<ChannelReddit> subreddits = new ArrayList<>();
 
     public MyBotTelegram(DefaultBotOptions options) {
         super(options);
@@ -213,7 +216,6 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 //        System.out.println(response.getBody());
 //        Long chatId = 457487030L;
 //        Long chatIdNast = 393135248L;
-
         List<String> resultResponseList = redditService.readArticles(redditService.getAuthToken(), channelRedditService.getAll());
         List<TelegramMessage> telegramMessageList = telegramMessageHandler.telegramMessageMarshaling(resultResponseList);
 
