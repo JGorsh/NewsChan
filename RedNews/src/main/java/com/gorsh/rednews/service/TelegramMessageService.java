@@ -1,5 +1,6 @@
 package com.gorsh.rednews.service;
 
+import com.gorsh.rednews.entities.ChannelReddit;
 import com.gorsh.rednews.entities.TelegramMessage;
 import com.gorsh.rednews.repository.TelegramMessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +21,9 @@ public class TelegramMessageService {
 
     public void saveAll (List<TelegramMessage> telegramMessageList){
         telegramMessageRepository.saveAll(telegramMessageList);
+    }
+
+    public List<TelegramMessage> getAll (){
+        return telegramMessageRepository.findAll();
     }
 }

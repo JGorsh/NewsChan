@@ -4,7 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BotRunner implements CommandLineRunner {
+public class ReadRedditRunner implements CommandLineRunner{
 
     @Override
     public void run(String... args) throws Exception {

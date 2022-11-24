@@ -3,6 +3,9 @@ package com.gorsh.rednews.reddit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gorsh.rednews.entities.ChannelReddit;
+import com.gorsh.rednews.service.ChannelRedditService;
+import com.gorsh.rednews.service.TelegramMessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -10,8 +13,29 @@ import java.io.IOException;
 import java.util.*;
 
 
-public class RedditService {
+public class RedditService implements Runnable{
 
+    @Autowired
+    ChannelRedditService channelRedditService;
+
+    @Autowired
+    TelegramMessageService telegramMessageService;
+    @Override
+    public void run() {
+        while(true){
+            List<ChannelReddit> channelRedditList = channelRedditService.getAll();
+            if(channelRedditList!=null){
+                List<String> bodyListResponse = readArticles(getAuthToken(),channelRedditService.getAll());
+
+
+            }
+            try {
+                Thread.sleep(30000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
     //получение токена доступа к апи
     public String getAuthToken(){
         RestTemplate restTemplate = new RestTemplate();
@@ -59,4 +83,6 @@ public class RedditService {
         }
         return bodyResponseList;
     }
+
+
 }
