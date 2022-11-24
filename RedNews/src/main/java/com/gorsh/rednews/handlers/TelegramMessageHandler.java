@@ -42,21 +42,14 @@ public class TelegramMessageHandler {
                             telegramMessage.setUrlMedia(objNode.get("data").get("media").get("reddit_video").get("fallback_url").asText());
                             telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
                             telegramMessageList.add(telegramMessage);
-                            //telegramMessageService.save(telegramMessage);
 
-                            System.out.println(objNode.get("data").get("title").asText());
-                            System.out.println(objNode.get("data").get("media").get("reddit_video").get("fallback_url").asText());
-                            System.out.println("reddit.com" + objNode.get("data").get("permalink").asText());
+//                            System.out.println(objNode.get("data").get("title").asText());
+//                            System.out.println(objNode.get("data").get("media").get("reddit_video").get("fallback_url").asText());
                         } else {
                             telegramMessage.setTitle(objNode.get("data").get("title").asText());
                             telegramMessage.setUrlMedia(objNode.get("data").get("url").asText());
                             telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
                             telegramMessageList.add(telegramMessage);
-                            //telegramMessageService.save(telegramMessage);
-
-                            System.out.println(objNode.get("data").get("title").asText());
-                            System.out.println(objNode.get("data").get("url").asText());
-                            System.out.println("reddit.com" + objNode.get("data").get("permalink").asText());
                         }
                     }
                 }

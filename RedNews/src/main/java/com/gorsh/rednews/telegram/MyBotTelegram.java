@@ -216,9 +216,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 //        System.out.println(response.getBody());
 //        Long chatId = 457487030L;
 //        Long chatIdNast = 393135248L;
-        List<String> resultResponseList = redditService.readArticles(redditService.getAuthToken(), channelRedditService.getAll());
         List<TelegramMessage> telegramMessageList = telegramMessageService.getAll();
- //       List<TelegramMessage> telegramMessageList = telegramMessageHandler.telegramMessageMarshaling(resultResponseList);
 
         for (TelegramMessage telegramMessage : telegramMessageList) {
 

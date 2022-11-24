@@ -20,4 +20,5 @@ public class ChannelRedditService {
     public List<ChannelReddit> getAll (){
         return channelRedditRepository.findAll();
     }
+
 }
