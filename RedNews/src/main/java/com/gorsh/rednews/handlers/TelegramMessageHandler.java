@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gorsh.rednews.entities.ChannelReddit;
 import com.gorsh.rednews.entities.TelegramMessage;
 import com.gorsh.rednews.service.ChannelRedditService;
-import com.gorsh.rednews.service.TelegramMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,43 +38,14 @@ public class TelegramMessageHandler {
                 if (node.isArray()) {
                     for (final JsonNode objNode : node) {
                         boolean isVideo = Boolean.valueOf((objNode.get("data").get("is_video").asText()));
+                        String subreddit = objNode.get("data").get("subreddit").asText();
                         telegramMessage = new TelegramMessage();
-
-                        if (isVideo) {
-                            telegramMessage.setTitle(objNode.get("data").get("title").asText());
-                            telegramMessage.setUrlMedia(objNode.get("data").get("media").get("reddit_video").get("fallback_url").asText());
-                            telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
-                            String subreddit = objNode.get("data").get("subreddit").asText();
-                            telegramMessageList.add(telegramMessage);
-                            for(ChannelReddit ch: channelRedditList){
-                                if(ch.getSubreddit().equals(subreddit)){
-                                    channelReddit = channelRedditService.getChannelRedditBySubreddit(subreddit);
-                                    if(!channelReddit.getMessages().contains(telegramMessage)){
-                                        channelReddit.getMessages().add(telegramMessage); // проверять на одинаковые
-                                        channelRedditService.save(channelReddit);
-                                    }
-                                }
-                            }
-                        } else {
-                            telegramMessage.setTitle(objNode.get("data").get("title").asText());
-                            telegramMessage.setUrlMedia(objNode.get("data").get("url").asText());
-                            telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
-                            telegramMessageList.add(telegramMessage);
-                            String subreddit = objNode.get("data").get("subreddit").asText();
-                            for(ChannelReddit ch: channelRedditList){
-                                if(ch.getSubreddit().equals(subreddit)){
-                                    channelReddit = channelRedditService.getChannelRedditBySubreddit(subreddit);
-                                    if(!channelReddit.getMessages().contains(telegramMessage)){
-                                        channelReddit.getMessages().add(telegramMessage); // проверять на одинаковые
-                                        channelRedditService.save(channelReddit);
-                                    }
-                                }
-                            }
-
+                        checkAndFillContent(telegramMessage, isVideo, objNode);
+                        telegramMessageList.add(telegramMessage);
+                        checkSaveMessageToDb(telegramMessage, channelRedditList, subreddit);
                         }
                     }
                 }
-            }
         } catch (JsonMappingException e) {
             throw new RuntimeException(e);
         } catch (JsonProcessingException e) {
@@ -84,7 +54,27 @@ public class TelegramMessageHandler {
         return telegramMessageList;
     }
 
-    public void saveMessageToChannelReddit (TelegramMessage telegramMessage){
+    public void checkSaveMessageToDb (TelegramMessage telegramMessage, List<ChannelReddit> channelRedditList, String subreddit){
+        for(ChannelReddit ch: channelRedditList) {
+            if (ch.getSubreddit().equals(subreddit)) {
+                channelReddit = channelRedditService.getChannelRedditBySubreddit(subreddit);
+                if (!channelReddit.getMessages().contains(telegramMessage)) {
+                    channelReddit.getMessages().add(telegramMessage);
+                    channelRedditService.save(channelReddit);
+                }
+            }
+        }
+    }
 
+    public void checkAndFillContent(TelegramMessage telegramMessage, Boolean isVideo, JsonNode objNode) {
+        if (isVideo) {
+            telegramMessage.setTitle(objNode.get("data").get("title").asText());
+            telegramMessage.setUrlMedia(objNode.get("data").get("media").get("reddit_video").get("fallback_url").asText());
+            telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
+        } else {
+            telegramMessage.setTitle(objNode.get("data").get("title").asText());
+            telegramMessage.setUrlMedia(objNode.get("data").get("url").asText());
+            telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
+        }
     }
 }

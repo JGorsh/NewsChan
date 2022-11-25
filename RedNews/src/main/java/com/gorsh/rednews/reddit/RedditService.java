@@ -41,7 +41,7 @@ public class RedditService implements Runnable{
                 System.out.println("Update");
             }
             try {
-                Thread.sleep(30000);
+                Thread.sleep(300000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
