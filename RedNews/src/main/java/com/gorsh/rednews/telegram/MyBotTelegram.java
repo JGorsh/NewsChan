@@ -80,15 +80,12 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
         SendMessage message = new SendMessage();
         String chatId = "";
-        Long userId;
         String userName;
         if (update.hasMessage()) {
             person = new Person();
             chatId = update.getMessage().getChatId().toString();
-            userId = update.getMessage().getFrom().getId();
             userName = update.getMessage().getFrom().getUserName();
             person.setChatId(chatId);
-            person.setUserId(userId);
             person.setUserName(userName);
             System.out.println(person.getChatId() + " " + person.getUserName());
             message.setChatId(chatId);
@@ -132,9 +129,11 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                 channelReddit = new ChannelReddit();
                 channelReddit.setSubreddit(subreddit);
                 channelReddit.setChannelFilter("new");
-                subreddits.add(channelReddit);
-                person.setSubreddits(subreddits);
-                personService.save(person);
+                Person personData  = personService.getByChatId(person.getChatId());
+
+                personData.getSubreddits().add(channelReddit);
+
+                personService.saveOrUpdate(personData);
                 startWait = false;
             }
 
@@ -145,6 +144,9 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         "Для остановки ленты введите команду /stop");
                 channelReddit.setSubreddit(subreddit);
                 channelReddit.setChannelFilter("hot");
+                person = personService.getByChatId(person.getChatId());
+                person.getSubreddits().add(channelReddit);
+                personService.saveOrUpdate(person);
                 startWait = false;
             }
 
@@ -155,6 +157,9 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         "Для остановки ленты введите команду /stop");
                 channelReddit.setSubreddit(subreddit);
                 channelReddit.setChannelFilter("top");
+                person = personService.getByChatId(person.getChatId());
+                person.getSubreddits().add(channelReddit);
+                personService.saveOrUpdate(person);
                 startWait = false;
             }
         }
@@ -197,8 +202,6 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
     public void sndMsgRdt(String chatId) {
 
-
-
 //        RestTemplate restTemplate = new RestTemplate();
 //        HttpHeaders headers = new HttpHeaders();
 //        HttpEntity<String> request = new HttpEntity<>(headers);
@@ -232,7 +235,6 @@ public class MyBotTelegram extends TelegramLongPollingBot {
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }
-
 
             System.out.println(telegramMessage.getTitle() + "\n\n"
                     + telegramMessage.getUrlMedia()

@@ -5,16 +5,18 @@ import com.gorsh.rednews.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 
 @Service
 public class PersonService {
 
     @Autowired
     PersonRepository personRepository;
-    
 
-    public Person save(Person person) {
+    public Person saveOrUpdate(Person person) {
         return personRepository.save(person);
+    }
+
+    public Person getByChatId (String chatId){
+        return personRepository.getPersonByChatId(chatId);
     }
 }

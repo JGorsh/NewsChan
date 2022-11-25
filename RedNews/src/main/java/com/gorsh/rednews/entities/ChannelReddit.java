@@ -25,7 +25,7 @@ public class ChannelReddit {
     @Column
     private String channelFilter;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "messageId")
     private List<TelegramMessage> messages = new ArrayList<>();
 

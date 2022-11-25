@@ -21,4 +21,8 @@ public class ChannelRedditService {
         return channelRedditRepository.findAll();
     }
 
+    public ChannelReddit getChannelRedditBySubreddit(String subreddit) {
+        return channelRedditRepository.getChannelRedditBySubreddit(subreddit);
+    }
+
 }

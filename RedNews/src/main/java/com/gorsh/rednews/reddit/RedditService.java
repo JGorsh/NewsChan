@@ -6,6 +6,7 @@ import com.gorsh.rednews.entities.ChannelReddit;
 import com.gorsh.rednews.entities.TelegramMessage;
 import com.gorsh.rednews.handlers.TelegramMessageHandler;
 import com.gorsh.rednews.service.ChannelRedditService;
+import com.gorsh.rednews.service.PersonService;
 import com.gorsh.rednews.service.TelegramMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -17,6 +18,9 @@ import java.util.*;
 
 @Component
 public class RedditService implements Runnable{
+
+    @Autowired
+    PersonService personService;
 
     @Autowired
     ChannelRedditService channelRedditService;
@@ -32,9 +36,8 @@ public class RedditService implements Runnable{
         while(true){
             List<ChannelReddit> channelRedditList = channelRedditService.getAll();
             if(channelRedditList!=null){
-                List<String> bodyListResponse = readArticles(getAuthToken(),channelRedditService.getAll());
-                List<TelegramMessage> telegramMessageList = telegramMessageHandler.telegramMessageMarshaling(bodyListResponse);
-                telegramMessageService.saveAll(telegramMessageList);
+                List<String> bodyListResponse = readArticles(getAuthToken(),channelRedditList);
+                telegramMessageHandler.telegramMessageMarshaling(bodyListResponse, channelRedditList);
                 System.out.println("Update");
             }
             try {
@@ -79,20 +82,18 @@ public class RedditService implements Runnable{
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         if (subreddits!=null){
             for(ChannelReddit ch : subreddits){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
                 String url = "https://oauth.reddit.com/r/" + ch.getSubreddit() + "/" + ch.getChannelFilter() + "?limit=1";
-                System.out.println("readReddit");
+                System.out.println(ch.getSubreddit());
                 response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
                 bodyResponseList.add(response.getBody());
 
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return bodyResponseList;
     }
-
-
 }
