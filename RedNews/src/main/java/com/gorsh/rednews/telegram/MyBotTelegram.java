@@ -121,6 +121,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
         }
 
         if (update.hasCallbackQuery() && startWait == false) {
+            Person personData  = personService.getByChatId(person.getChatId());
             if (update.getCallbackQuery().getData().equals("new")) {
                 filter = "new";
                 message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром new" + "\n" +
@@ -129,11 +130,15 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                 channelReddit = new ChannelReddit();
                 channelReddit.setSubreddit(subreddit);
                 channelReddit.setChannelFilter("new");
-                Person personData  = personService.getByChatId(person.getChatId());
 
-                personData.getSubreddits().add(channelReddit);
-
-                personService.saveOrUpdate(personData);
+                if(personData==null){
+                    person.getSubreddits().add(channelReddit);
+                    personService.save(person);
+                }
+                else{
+                    personData.getSubreddits().add(channelReddit);
+                    personService.save(personData);
+                }
                 startWait = false;
             }
 
@@ -144,9 +149,15 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         "Для остановки ленты введите команду /stop");
                 channelReddit.setSubreddit(subreddit);
                 channelReddit.setChannelFilter("hot");
-                person = personService.getByChatId(person.getChatId());
-                person.getSubreddits().add(channelReddit);
-                personService.saveOrUpdate(person);
+
+                if(personData==null){
+                    person.getSubreddits().add(channelReddit);
+                    personService.save(person);
+                }
+                else{
+                    personData.getSubreddits().add(channelReddit);
+                    personService.save(personData);
+                }
                 startWait = false;
             }
 
@@ -157,9 +168,15 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         "Для остановки ленты введите команду /stop");
                 channelReddit.setSubreddit(subreddit);
                 channelReddit.setChannelFilter("top");
-                person = personService.getByChatId(person.getChatId());
-                person.getSubreddits().add(channelReddit);
-                personService.saveOrUpdate(person);
+
+                if(personData==null){
+                    person.getSubreddits().add(channelReddit);
+                    personService.save(person);
+                }
+                else{
+                    personData.getSubreddits().add(channelReddit);
+                    personService.save(personData);
+                }
                 startWait = false;
             }
         }

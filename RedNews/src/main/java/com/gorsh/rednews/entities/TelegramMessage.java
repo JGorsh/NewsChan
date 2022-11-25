@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -26,4 +27,16 @@ public class TelegramMessage {
     @Column
     private String urlMedia;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TelegramMessage that = (TelegramMessage) o;
+        return Objects.equals(title, that.title) && Objects.equals(urlPost, that.urlPost) && Objects.equals(urlMedia, that.urlMedia);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, urlPost, urlMedia);
+    }
 }
