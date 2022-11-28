@@ -29,7 +29,7 @@ import java.util.List;
 @Getter
 @Setter
 @Component
-public class MyBotTelegram extends TelegramLongPollingBot implements Runnable{
+public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
 
     private String subreddit;
 
@@ -97,7 +97,7 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable{
 
         redditService = new RedditService();
 
-        if (update.hasMessage() && update.getMessage().hasText() && userStatusCache.getUsersCurrentTelegramStatus(chatId)==null) {
+        if (update.hasMessage() && update.getMessage().hasText() && userStatusCache.getUsersCurrentTelegramStatus(chatId) == null) {
             String command = update.getMessage().getText();
             if (command.equals("/start")) {
                 message.setText("Введите отслеживаемый subreddit ");
@@ -111,68 +111,29 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable{
                 sndMsgRdt(chatId);
             }
         } else if (update.hasMessage() && update.getMessage().hasText()
-                && userStatusCache.getUsersCurrentTelegramStatus(chatId)== TelegramStatus.START) {
+                && userStatusCache.getUsersCurrentTelegramStatus(chatId) == TelegramStatus.START) {
             subreddit = update.getMessage().getText();
             message.setText("Выберите фильтр для " + update.getMessage().getText());
             message.setReplyMarkup(getInlineMessageButton());
             userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.FILTER);
         }
 
-        if (update.hasCallbackQuery() && userStatusCache.getUsersCurrentTelegramStatus(chatId)== TelegramStatus.FILTER) {
-            Person personData  = personService.getByChatId(person.getChatId());
-            if (update.getCallbackQuery().getData().equals("new")) {
-                filter = "new";
-                message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром new" + "\n" +
-                        "Для запуска ленты введите команду /run" + "\n" +
-                        "Для остановки ленты введите команду /stop");
-                channelReddit = new ChannelReddit();
-                channelReddit.setSubreddit(subreddit);
-                channelReddit.setChannelFilter("new");
+        if (update.hasCallbackQuery() && userStatusCache.getUsersCurrentTelegramStatus(chatId) == TelegramStatus.FILTER) {
+            Person personData = personService.getByChatId(person.getChatId());
+            filter = update.getCallbackQuery().getData();
 
-                if(personData==null){
-                    person.getSubreddits().add(channelReddit);
-                    personService.save(person);
-                }
-                else{
-                    personData.getSubreddits().add(channelReddit);
-                    personService.save(personData);
-                }
-            }
+            setTextMessageFilterAndSubreddit(subreddit, filter, message);
+            userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUN);
+            channelReddit = new ChannelReddit();
+            channelReddit.setSubreddit(subreddit);
+            channelReddit.setChannelFilter(filter);
 
-            if (update.getCallbackQuery().getData().equals("hot")) {
-                filter = "hot";
-                message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром hot" + "\n" +
-                        "Для запуска ленты введите команду /run" + "\n" +
-                        "Для остановки ленты введите команду /stop");
-                channelReddit.setSubreddit(subreddit);
-                channelReddit.setChannelFilter("hot");
-
-                if(personData==null){
-                    person.getSubreddits().add(channelReddit);
-                    personService.save(person);
-                }
-                else{
-                    personData.getSubreddits().add(channelReddit);
-                    personService.save(personData);
-                }
-            }
-
-            if (update.getCallbackQuery().getData().equals("top")) {
-                filter = "top";
-                message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром top" + "\n" +
-                        "Для запуска ленты введите команду /run" + "\n" +
-                        "Для остановки ленты введите команду /stop");
-                channelReddit.setSubreddit(subreddit);
-                channelReddit.setChannelFilter("top");
-
-                if(personData==null){
-                    person.getSubreddits().add(channelReddit);
-                    personService.save(person);
-                }
-                else{
-                    personData.getSubreddits().add(channelReddit);
-                    personService.save(personData);
-                }
+            if (personData == null) {
+                person.getSubreddits().add(channelReddit);
+                personService.save(person);
+            } else {
+                personData.getSubreddits().add(channelReddit);
+                personService.save(personData);
             }
         }
         try {
@@ -254,6 +215,12 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable{
                     + "reddit.com" + telegramMessage.getUrlPost());
         }
 
+    }
+
+    private void setTextMessageFilterAndSubreddit(String subreddit, String filter, SendMessage message) {
+        message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром " + filter + "\n" +
+                "Для запуска ленты введите команду /run" + "\n" +
+                "Для остановки ленты введите команду /stop");
     }
 
     @Override
