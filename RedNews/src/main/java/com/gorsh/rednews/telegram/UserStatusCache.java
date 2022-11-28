@@ -8,13 +8,13 @@ import java.util.Map;
 @Component
 public class UserStatusCache {
 
-    private Map<Long, TelegramStatus> usersTelegramStatus = new HashMap<>();
+    private Map<String, TelegramStatus> usersTelegramStatus = new HashMap<>();
 
-    public void setUsersCurrentTelegramStatus(Long userId, TelegramStatus telegramStatus) {
+    public void setUsersCurrentTelegramStatus(String userId, TelegramStatus telegramStatus) {
         usersTelegramStatus.put(userId, telegramStatus);
     }
 
-    public TelegramStatus getUsersCurrentTelegramStatus(Long userId) {
+    public TelegramStatus getUsersCurrentTelegramStatus(String userId) {
         TelegramStatus telegramStatus = usersTelegramStatus.get(userId);
         if (telegramStatus == null) {
             telegramStatus = TelegramStatus.START;

@@ -29,15 +29,11 @@ import java.util.List;
 @Getter
 @Setter
 @Component
-public class MyBotTelegram extends TelegramLongPollingBot {
+public class MyBotTelegram extends TelegramLongPollingBot implements Runnable{
 
     private String subreddit;
+
     private String filter;
-    boolean startWait = false;
-
-    private TelegramStatus status;
-
-    private boolean lentaLoop = false;
 
     private Person person;
 
@@ -46,6 +42,8 @@ public class MyBotTelegram extends TelegramLongPollingBot {
     private TelegramMessage telegramMessage;
 
     private RedditService redditService;
+
+    private TelegramStatus telegramStatus;
 
     @Autowired
     PersonService personService;
@@ -58,6 +56,9 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
     @Autowired
     TelegramMessageService telegramMessageService;
+
+    @Autowired
+    UserStatusCache userStatusCache;
 
     private List<ChannelReddit> subreddits = new ArrayList<>();
 
@@ -77,7 +78,6 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-
         SendMessage message = new SendMessage();
         String chatId = "";
         String userName;
@@ -97,30 +97,28 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
         redditService = new RedditService();
 
-        if (update.hasMessage() && update.getMessage().hasText() && startWait == false) {
+        if (update.hasMessage() && update.getMessage().hasText() && userStatusCache.getUsersCurrentTelegramStatus(chatId)==null) {
             String command = update.getMessage().getText();
             if (command.equals("/start")) {
                 message.setText("Введите отслеживаемый subreddit ");
-                startWait = true; // Переменная = true в этом цикле она не будет false, а значит будет считка сообщения до тех пор, пока она снова не станет false
+                userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
             }
 
             if (command.equals("/stop")) {
-                lentaLoop = false;
             }
 
             if (command.equals("/run")) {
-                lentaLoop = true;
                 sndMsgRdt(chatId);
-                startWait = false; // Переменная = true в этом цикле она не будет false, а значит будет считка сообщения до тех пор, пока она снова не станет false
             }
-        } else if (update.hasMessage() && update.getMessage().hasText() && startWait == true) {
+        } else if (update.hasMessage() && update.getMessage().hasText()
+                && userStatusCache.getUsersCurrentTelegramStatus(chatId)== TelegramStatus.START) {
             subreddit = update.getMessage().getText();
             message.setText("Выберите фильтр для " + update.getMessage().getText());
             message.setReplyMarkup(getInlineMessageButton());
-            startWait = false; // "Считка" закончена
+            userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.FILTER);
         }
 
-        if (update.hasCallbackQuery() && startWait == false) {
+        if (update.hasCallbackQuery() && userStatusCache.getUsersCurrentTelegramStatus(chatId)== TelegramStatus.FILTER) {
             Person personData  = personService.getByChatId(person.getChatId());
             if (update.getCallbackQuery().getData().equals("new")) {
                 filter = "new";
@@ -139,7 +137,6 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                     personData.getSubreddits().add(channelReddit);
                     personService.save(personData);
                 }
-                startWait = false;
             }
 
             if (update.getCallbackQuery().getData().equals("hot")) {
@@ -158,7 +155,6 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                     personData.getSubreddits().add(channelReddit);
                     personService.save(personData);
                 }
-                startWait = false;
             }
 
             if (update.getCallbackQuery().getData().equals("top")) {
@@ -177,7 +173,6 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                     personData.getSubreddits().add(channelReddit);
                     personService.save(personData);
                 }
-                startWait = false;
             }
         }
         try {
@@ -258,6 +253,11 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                     + "\n\n" + "Link Post: "
                     + "reddit.com" + telegramMessage.getUrlPost());
         }
+
+    }
+
+    @Override
+    public void run() {
 
     }
 }

@@ -5,5 +5,6 @@ public enum TelegramStatus {
     STOP,
     START,
     DELETE,
-    UPDATE
+    UPDATE,
+    FILTER
 }
