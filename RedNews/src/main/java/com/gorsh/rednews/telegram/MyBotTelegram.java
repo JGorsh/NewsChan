@@ -19,7 +19,10 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -68,7 +71,7 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
 
     @Override
     public String getBotUsername() {
-        return "RedditNewsChanelBot";
+        return "RedditNewsChannelBot";
     }
 
     @Override
@@ -95,27 +98,33 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
             message.setChatId(chatId);
         }
 
+        if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().equals("/start")){
+            message.setText("Введите отслеживаемый subreddit ");
+            userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
+        }
+
         redditService = new RedditService();
 
-        if (update.hasMessage() && update.getMessage().hasText() && userStatusCache.getUsersCurrentTelegramStatus(chatId) == null) {
-            String command = update.getMessage().getText();
-            if (command.equals("/start")) {
-                message.setText("Введите отслеживаемый subreddit ");
-                userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
-            }
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            TelegramStatus telegramStatus = userStatusCache.getUsersCurrentTelegramStatus(chatId);
+            //String command = update.getMessage().getText();
+            switch (telegramStatus) {
+                case START :
+                    subreddit = update.getMessage().getText();
+                    message.setText("Выберите фильтр для " + update.getMessage().getText());
+                    message.setReplyMarkup(getInlineMessageButtonFilter());
+                    userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.FILTER);
+                    break;
 
-            if (command.equals("/stop")) {
+                case RUN:
+                    sndMsgRdt(chatId);
+                    break;
+//
+//                default:
+//                    message.setText("Введите отслеживаемый subreddit ");
+//                    userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
+//                    break;
             }
-
-            if (command.equals("/run")) {
-                sndMsgRdt(chatId);
-            }
-        } else if (update.hasMessage() && update.getMessage().hasText()
-                && userStatusCache.getUsersCurrentTelegramStatus(chatId) == TelegramStatus.START) {
-            subreddit = update.getMessage().getText();
-            message.setText("Выберите фильтр для " + update.getMessage().getText());
-            message.setReplyMarkup(getInlineMessageButton());
-            userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.FILTER);
         }
 
         if (update.hasCallbackQuery() && userStatusCache.getUsersCurrentTelegramStatus(chatId) == TelegramStatus.FILTER) {
@@ -128,6 +137,7 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
             channelReddit.setSubreddit(subreddit);
             channelReddit.setChannelFilter(filter);
 
+            // добавление нового пользователя (разобраться)
             if (personData == null) {
                 person.getSubreddits().add(channelReddit);
                 personService.save(person);
@@ -143,7 +153,7 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
         }
     }
 
-    private InlineKeyboardMarkup getInlineMessageButton() {
+    private InlineKeyboardMarkup getInlineMessageButtonFilter() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
         InlineKeyboardButton buttonNew = new InlineKeyboardButton();
@@ -172,6 +182,18 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
         return inlineKeyboardMarkup;
     }
 
+    private ReplyKeyboardMarkup getInlineMessageButtonGreeting() {
+        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
+        KeyboardButton button = new KeyboardButton();
+        button.setText("\uD83D\uDC49 Start \uD83D\uDCE3");
+        List<KeyboardRow> keyboardRowList = new ArrayList<>();
+        KeyboardRow keyboardRow = new KeyboardRow();
+        keyboardRow.add(button);
+        keyboardRowList.add(keyboardRow);
+        markup.setKeyboard(keyboardRowList);
+        markup.setOneTimeKeyboard(true);
+        return markup;
+    }
 
     public void sndMsgRdt(String chatId) {
 
