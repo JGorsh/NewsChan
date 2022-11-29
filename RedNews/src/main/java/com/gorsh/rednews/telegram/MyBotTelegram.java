@@ -112,7 +112,8 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
                     break;
 
                 case RUN:
-                    sndMsgRdt(chatId);
+                    person = personService.getByChatId(chatId);
+                    person.setDistribution(true);
                     System.out.println("run");
                     break;
 
@@ -121,9 +122,12 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
                     userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
                     System.out.println("default");
                     break;
+                //не отреагирует на стоп
                 case STOP:
-                    message.setText("Введите отслеживаемый subreddit ");
+                    message.setText("Бот остановлен! ");
                     userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.DEFAULT);
+                    person = personService.getByChatId(chatId);
+                    person.setDistribution(false);
                     System.out.println("stop");
                     break;
             }

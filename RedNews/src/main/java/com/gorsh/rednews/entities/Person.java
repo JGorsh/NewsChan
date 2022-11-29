@@ -26,6 +26,9 @@ public class Person implements Serializable {
     @Column
     private String userName;
 
+    @Column
+    private boolean isDistribution;
+
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "channelRedditId")
     private List<ChannelReddit> subreddits = new ArrayList<>();
