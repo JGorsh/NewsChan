@@ -98,32 +98,34 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
             message.setChatId(chatId);
         }
 
-        if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().equals("/start")){
-            message.setText("Введите отслеживаемый subreddit ");
-            userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
-        }
-
         redditService = new RedditService();
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             TelegramStatus telegramStatus = userStatusCache.getUsersCurrentTelegramStatus(chatId);
-            //String command = update.getMessage().getText();
             switch (telegramStatus) {
                 case START :
                     subreddit = update.getMessage().getText();
                     message.setText("Выберите фильтр для " + update.getMessage().getText());
                     message.setReplyMarkup(getInlineMessageButtonFilter());
                     userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.FILTER);
+                    System.out.println("start");
                     break;
 
                 case RUN:
                     sndMsgRdt(chatId);
+                    System.out.println("run");
                     break;
-//
-//                default:
-//                    message.setText("Введите отслеживаемый subreddit ");
-//                    userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
-//                    break;
+
+                case DEFAULT:
+                    message.setText("Введите отслеживаемый subreddit ");
+                    userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
+                    System.out.println("default");
+                    break;
+                case STOP:
+                    message.setText("Введите отслеживаемый subreddit ");
+                    userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.DEFAULT);
+                    System.out.println("stop");
+                    break;
             }
         }
 
@@ -220,11 +222,11 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
             SendMessage message = new SendMessage();
             message.setChatId(chatId);
 
-            message.setText(telegramMessage.getTitle()
+            message.setText(telegramMessage.getTitle() + "\uD83D\uDC48"
                     + "\n\n"
                     + telegramMessage.getUrlMedia()
                     + "\n\n" + "Link Post: "
-                    + "reddit.com" + telegramMessage.getUrlPost());
+                    + "reddit.com" + telegramMessage.getUrlPost() + "\uD83D\uDCAC");
             try {
                 execute(message);
             } catch (TelegramApiException e) {
@@ -236,7 +238,6 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
                     + "\n\n" + "Link Post: "
                     + "reddit.com" + telegramMessage.getUrlPost());
         }
-
     }
 
     private void setTextMessageFilterAndSubreddit(String subreddit, String filter, SendMessage message) {

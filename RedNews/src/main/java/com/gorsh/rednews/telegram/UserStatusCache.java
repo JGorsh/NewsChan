@@ -17,7 +17,7 @@ public class UserStatusCache {
     public TelegramStatus getUsersCurrentTelegramStatus(String userId) {
         TelegramStatus telegramStatus = usersTelegramStatus.get(userId);
         if (telegramStatus == null) {
-            telegramStatus = TelegramStatus.START;
+            telegramStatus = TelegramStatus.DEFAULT;
         }
         return telegramStatus;
     }
