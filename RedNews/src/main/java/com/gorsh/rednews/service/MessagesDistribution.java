@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Component
-public class MessagesDistribution {
+public class MessagesDistribution implements Runnable{
 
     @Autowired
     PersonService personService;
@@ -28,27 +28,36 @@ public class MessagesDistribution {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<String, String>();
         List<Person> personList = personService.getPersonList();
 
-        for (Person person : personList){
-            if (person.isDistribution()){
-                body.add("chat_id", person.getChatId());
-                List<ChannelReddit> channelRedditList = person.getSubreddits();
+        while (true){
+            if(personList!=null){
+                for (Person person : personList) {
+                    if (person.isDistribution()) {
+                        body.add("chat_id", person.getChatId());
+                        List<ChannelReddit> channelRedditList = person.getSubreddits();
 
-                for(ChannelReddit channelReddit : channelRedditList){
-                    List<TelegramMessage> telegramMessageList = channelReddit.getMessages();
+                        for (ChannelReddit channelReddit : channelRedditList) {
+                            List<TelegramMessage> telegramMessageList = channelReddit.getMessages();
 
-                    for(TelegramMessage telegramMessage : telegramMessageList){
-                        handlerMsgRdt(telegramMessage, body);
-                        HttpEntity<Object> request = new HttpEntity<>(body, headers);
-                        restTemplate.postForEntity(apiUrl, request,  String.class);
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
+                            for (TelegramMessage telegramMessage : telegramMessageList) {
+                                handlerMsgRdt(telegramMessage, body);
+                                HttpEntity<Object> request = new HttpEntity<>(body, headers);
+                                try {
+                                    restTemplate.postForEntity(apiUrl, request, String.class);
+                                } catch (Exception e) {
+                                    continue;
+                                }
+                            }
                         }
                     }
                 }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
+
     }
 
     public void handlerMsgRdt(TelegramMessage telegramMessage, MultiValueMap<String, String> body) {
@@ -77,5 +86,10 @@ public class MessagesDistribution {
         body.add("text", bodyString);
 
         System.out.println(bodyString);
+    }
+
+    @Override
+    public void run() {
+        onTelegramDistribution("5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g");
     }
 }

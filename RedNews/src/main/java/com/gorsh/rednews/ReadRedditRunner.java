@@ -24,7 +24,9 @@ public class ReadRedditRunner implements CommandLineRunner{
         System.setProperty("https.proxyHost", "proxy.orb.ru");
         System.setProperty("https.proxyPort", "3128");
 
-        Thread thread = new Thread(redditService);
-        thread.start();
+        Thread redditThread = new Thread(redditService);
+        Thread messagesDistributionThread = new Thread();
+        redditThread.start();
+        messagesDistributionThread.start();
     }
 }
