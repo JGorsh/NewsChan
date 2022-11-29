@@ -32,7 +32,7 @@ import java.util.List;
 @Getter
 @Setter
 @Component
-public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
+public class MyBotTelegram extends TelegramLongPollingBot{
 
     private String subreddit;
 
@@ -114,6 +114,8 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
                 case RUN:
                     person = personService.getByChatId(chatId);
                     person.setDistribution(true);
+                    personService.save(person);
+                    message.setText("Бот запущен!");
                     System.out.println("run");
                     break;
 
@@ -128,6 +130,7 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
                     userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.DEFAULT);
                     person = personService.getByChatId(chatId);
                     person.setDistribution(false);
+                    personService.save(person);
                     System.out.println("stop");
                     break;
             }
@@ -188,28 +191,23 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
         return inlineKeyboardMarkup;
     }
 
-    private ReplyKeyboardMarkup getInlineMessageButtonGreeting() {
-        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
-        KeyboardButton button = new KeyboardButton();
-        button.setText("\uD83D\uDC49 Start \uD83D\uDCE3");
-        List<KeyboardRow> keyboardRowList = new ArrayList<>();
-        KeyboardRow keyboardRow = new KeyboardRow();
-        keyboardRow.add(button);
-        keyboardRowList.add(keyboardRow);
-        markup.setKeyboard(keyboardRowList);
-        markup.setOneTimeKeyboard(true);
-        return markup;
-    }
+//    private ReplyKeyboardMarkup getInlineMessageButtonGreeting() {
+//        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
+//        KeyboardButton button = new KeyboardButton();
+//        button.setText("\uD83D\uDC49 Start \uD83D\uDCE3");
+//        List<KeyboardRow> keyboardRowList = new ArrayList<>();
+//        KeyboardRow keyboardRow = new KeyboardRow();
+//        keyboardRow.add(button);
+//        keyboardRowList.add(keyboardRow);
+//        markup.setKeyboard(keyboardRowList);
+//        markup.setOneTimeKeyboard(true);
+//        return markup;
+//    }
 
     private void setTextMessageFilterAndSubreddit(String subreddit, String filter, SendMessage message) {
         message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром " + filter + "\n" +
                 "Для запуска ленты введите команду /run" + "\n" +
                 "Для остановки ленты введите команду /stop");
-    }
-
-    @Override
-    public void run() {
-
     }
 }
 

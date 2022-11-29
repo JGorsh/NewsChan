@@ -6,6 +6,7 @@ import com.gorsh.rednews.entities.TelegramMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -42,7 +43,8 @@ public class MessagesDistribution implements Runnable{
                                 handlerMsgRdt(telegramMessage, body);
                                 HttpEntity<Object> request = new HttpEntity<>(body, headers);
                                 try {
-                                    restTemplate.postForEntity(apiUrl, request, String.class);
+                                    ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
+                                    System.out.println(response.getBody());
                                 } catch (Exception e) {
                                     continue;
                                 }

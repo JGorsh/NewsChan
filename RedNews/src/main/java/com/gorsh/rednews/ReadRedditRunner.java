@@ -1,6 +1,7 @@
 package com.gorsh.rednews;
 
 import com.gorsh.rednews.reddit.RedditService;
+import com.gorsh.rednews.service.MessagesDistribution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,10 @@ public class ReadRedditRunner implements CommandLineRunner{
 
     @Autowired
     RedditService redditService;
+
+    @Autowired
+    MessagesDistribution messagesDistribution;
+
     @Override
     public void run(String... args) throws Exception {
 
@@ -25,7 +30,7 @@ public class ReadRedditRunner implements CommandLineRunner{
         System.setProperty("https.proxyPort", "3128");
 
         Thread redditThread = new Thread(redditService);
-        Thread messagesDistributionThread = new Thread();
+        Thread messagesDistributionThread = new Thread(messagesDistribution);
         redditThread.start();
         messagesDistributionThread.start();
     }
