@@ -201,49 +201,6 @@ public class MyBotTelegram extends TelegramLongPollingBot implements Runnable {
         return markup;
     }
 
-    public void sndMsgRdt(String chatId) {
-
-//        RestTemplate restTemplate = new RestTemplate();
-//        HttpHeaders headers = new HttpHeaders();
-//        HttpEntity<String> request = new HttpEntity<>(headers);
-//        ResponseEntity<String> response = restTemplate.postForEntity("https://api.telegram.org/bot5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g/getUpdates", request,  String.class);
-//        System.out.println(response.getBody());
-
-//        RestTemplate restTemplate = new RestTemplate();
-//        HttpHeaders headers = new HttpHeaders();
-//        MultiValueMap<String, String> body = new LinkedMultiValueMap<String, String>();
-//        body.add("chat_id", "457487030");
-//        body.add("text", "Hello");
-//        HttpEntity<Object> request = new HttpEntity<>(body, headers);
-//        ResponseEntity<String> response = restTemplate.postForEntity("https://api.telegram.org/bot5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g/sendMessage", request,  String.class);
-//        System.out.println(response.getBody());
-//        Long chatId = 457487030L;
-//        Long chatIdNast = 393135248L;
-        List<TelegramMessage> telegramMessageList = telegramMessageService.getAll();
-
-        for (TelegramMessage telegramMessage : telegramMessageList) {
-
-            SendMessage message = new SendMessage();
-            message.setChatId(chatId);
-
-            message.setText(telegramMessage.getTitle() + "\uD83D\uDC48"
-                    + "\n\n"
-                    + telegramMessage.getUrlMedia()
-                    + "\n\n" + "Link Post: "
-                    + "reddit.com" + telegramMessage.getUrlPost() + "\uD83D\uDCAC");
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
-            }
-
-            System.out.println(telegramMessage.getTitle() + "\n\n"
-                    + telegramMessage.getUrlMedia()
-                    + "\n\n" + "Link Post: "
-                    + "reddit.com" + telegramMessage.getUrlPost());
-        }
-    }
-
     private void setTextMessageFilterAndSubreddit(String subreddit, String filter, SendMessage message) {
         message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром " + filter + "\n" +
                 "Для запуска ленты введите команду /run" + "\n" +

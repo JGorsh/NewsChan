@@ -30,7 +30,7 @@ public class Person implements Serializable {
     private boolean isDistribution;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "channelRedditId")
+    @JoinColumn(name = "person_id")
     private List<ChannelReddit> subreddits = new ArrayList<>();
 
 }
