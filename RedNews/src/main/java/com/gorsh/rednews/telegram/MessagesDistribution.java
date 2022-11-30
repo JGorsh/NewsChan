@@ -90,9 +90,9 @@ public class MessagesDistribution implements Runnable{
         String bodyString = "**" + subreddit + "**"
                 + "\n\n"
                 + telegramMessage.getTitle()
-                + "\n\n"
-                + telegramMessage.getUrlMedia()
                 + "\n\n" + "Link Post: "
+                + telegramMessage.getUrlMedia()
+                + "\n\n"
                 + "reddit.com" + telegramMessage.getUrlPost() + "\uD83D\uDCAC";
 
         body.add("chat_id", person.getChatId());
