@@ -7,7 +7,8 @@ import com.gorsh.rednews.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -30,7 +31,7 @@ public class MessagesDistribution implements Runnable{
         MultiValueMap<String, String> body;
         List<Person> personList = personService.getPersonList();
 
-        while (true){
+        //while (true){
             if(personList!=null){
                 for (Person person : personList) {
                     if (person.isDistribution()) {
@@ -54,20 +55,20 @@ public class MessagesDistribution implements Runnable{
                                     }
                                     telegramMessage.setSent(true);
                                     personService.save(person);
-                                    System.out.println(telegramMessage.getTitle() + "отправлено!!!");
+                                    System.out.println(telegramMessage.getTitle() + "\n отправлено!!!");
                                 }
 
                             }
                         }
                     }
                 }
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+//                try {
+//                    Thread.sleep(5000);
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }
             }
-        }
+        //}
 
     }
 
@@ -99,6 +100,7 @@ public class MessagesDistribution implements Runnable{
     }
 
     @Override
+    @Scheduled(fixedDelay = 10000)
     public void run() {
         onTelegramDistribution("5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g");
     }
