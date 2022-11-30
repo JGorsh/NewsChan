@@ -3,7 +3,6 @@ package com.gorsh.rednews.reddit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gorsh.rednews.entities.ChannelReddit;
-import com.gorsh.rednews.entities.TelegramMessage;
 import com.gorsh.rednews.handlers.TelegramMessageHandler;
 import com.gorsh.rednews.service.ChannelRedditService;
 import com.gorsh.rednews.service.PersonService;
@@ -41,6 +40,7 @@ public class RedditService implements Runnable{
                 System.out.println("Update");
             }
             try {
+                //задержка запросов апи реддита
                 Thread.sleep(300000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

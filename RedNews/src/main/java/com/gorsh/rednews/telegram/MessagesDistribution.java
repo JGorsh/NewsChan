@@ -7,7 +7,6 @@ import com.gorsh.rednews.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,14 +35,13 @@ public class MessagesDistribution implements Runnable{
                 for (Person person : personList) {
                     if (person.isDistribution()) {
                         List<ChannelReddit> channelRedditList = person.getSubreddits();
-
                         for (ChannelReddit channelReddit : channelRedditList) {
                             List<TelegramMessage> telegramMessageList = channelReddit.getMessages();
-
+                            String subreddit = channelReddit.getSubreddit();
                             for (TelegramMessage telegramMessage : telegramMessageList) {
                                 if(!telegramMessage.isSent()){
                                     body = new LinkedMultiValueMap<>();
-                                    handlerMsgRdt(person, telegramMessage, body);
+                                    handlerMsgRdt(person, telegramMessage, body, subreddit);
                                     HttpEntity<Object> request = new HttpEntity<>(body, headers);
                                     System.out.println(telegramMessage);
                                     System.out.println(request);
@@ -72,7 +70,7 @@ public class MessagesDistribution implements Runnable{
 
     }
 
-    public void handlerMsgRdt(Person person, TelegramMessage telegramMessage, MultiValueMap<String, String> body) {
+    public void handlerMsgRdt(Person person, TelegramMessage telegramMessage, MultiValueMap<String, String> body, String subreddit) {
 //        RestTemplate restTemplate = new RestTemplate();
 //        HttpHeaders headers = new HttpHeaders();
 //        HttpEntity<String> request = new HttpEntity<>(headers);
@@ -89,7 +87,9 @@ public class MessagesDistribution implements Runnable{
 //        System.out.println(response.getBody());
 //        Long chatId = 457487030L;
 //        Long chatIdNast = 393135248L
-        String bodyString = telegramMessage.getTitle() + "\uD83D\uDC48"
+        String bodyString = "**" + subreddit + "**"
+                + "\n\n"
+                + telegramMessage.getTitle()
                 + "\n\n"
                 + telegramMessage.getUrlMedia()
                 + "\n\n" + "Link Post: "
@@ -100,7 +100,7 @@ public class MessagesDistribution implements Runnable{
     }
 
     @Override
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 300000)
     public void run() {
         onTelegramDistribution("5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g");
     }
