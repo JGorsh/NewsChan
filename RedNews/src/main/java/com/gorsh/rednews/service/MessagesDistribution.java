@@ -23,29 +23,32 @@ public class MessagesDistribution implements Runnable{
     //обработать похожие сообщения
     private void onTelegramDistribution(String botToken){
 
-        String apiUrl = "https://api.telegram.org/" + botToken + "/sendMessage";
+        String apiUrl = "https://api.telegram.org/bot" + botToken + "/sendMessage";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<String, String>();
+        MultiValueMap<String, String> body;
         List<Person> personList = personService.getPersonList();
 
         while (true){
             if(personList!=null){
                 for (Person person : personList) {
                     if (person.isDistribution()) {
-                        body.add("chat_id", person.getChatId());
                         List<ChannelReddit> channelRedditList = person.getSubreddits();
 
                         for (ChannelReddit channelReddit : channelRedditList) {
                             List<TelegramMessage> telegramMessageList = channelReddit.getMessages();
 
                             for (TelegramMessage telegramMessage : telegramMessageList) {
-                                handlerMsgRdt(telegramMessage, body);
+                                body = new LinkedMultiValueMap<String, String>();
+                                handlerMsgRdt(person, telegramMessage, body);
                                 HttpEntity<Object> request = new HttpEntity<>(body, headers);
+                                System.out.println(telegramMessage);
+                                System.out.println(request);
                                 try {
                                     ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
-                                    System.out.println(response.getBody());
+                                    //System.out.println(response.getBody());
                                 } catch (Exception e) {
+                                    e.printStackTrace();
                                     continue;
                                 }
                             }
@@ -53,7 +56,7 @@ public class MessagesDistribution implements Runnable{
                     }
                 }
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -62,7 +65,7 @@ public class MessagesDistribution implements Runnable{
 
     }
 
-    public void handlerMsgRdt(TelegramMessage telegramMessage, MultiValueMap<String, String> body) {
+    public void handlerMsgRdt(Person person, TelegramMessage telegramMessage, MultiValueMap<String, String> body) {
 //        RestTemplate restTemplate = new RestTemplate();
 //        HttpHeaders headers = new HttpHeaders();
 //        HttpEntity<String> request = new HttpEntity<>(headers);
@@ -85,9 +88,8 @@ public class MessagesDistribution implements Runnable{
                 + "\n\n" + "Link Post: "
                 + "reddit.com" + telegramMessage.getUrlPost() + "\uD83D\uDCAC";
 
+        body.add("chat_id", person.getChatId());
         body.add("text", bodyString);
-
-        System.out.println(bodyString);
     }
 
     @Override
