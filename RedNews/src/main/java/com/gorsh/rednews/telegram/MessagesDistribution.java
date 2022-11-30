@@ -40,19 +40,23 @@ public class MessagesDistribution implements Runnable{
                             List<TelegramMessage> telegramMessageList = channelReddit.getMessages();
 
                             for (TelegramMessage telegramMessage : telegramMessageList) {
-                                body = new LinkedMultiValueMap<>();
-                                handlerMsgRdt(person, telegramMessage, body);
-                                HttpEntity<Object> request = new HttpEntity<>(body, headers);
-                                System.out.println(telegramMessage);
-                                System.out.println(request);
-                                try {
-                                    //ResponseEntity<String> response =
-                                    restTemplate.postForEntity(apiUrl, request, String.class);
-                                    //System.out.println(response.getBody());
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    continue;
+                                if(!telegramMessage.isSent()){
+                                    body = new LinkedMultiValueMap<>();
+                                    handlerMsgRdt(person, telegramMessage, body);
+                                    HttpEntity<Object> request = new HttpEntity<>(body, headers);
+                                    System.out.println(telegramMessage);
+                                    System.out.println(request);
+                                    try {
+                                        restTemplate.postForEntity(apiUrl, request, String.class);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        continue;
+                                    }
+                                    telegramMessage.setSent(true);
+                                    personService.save(person);
+                                    System.out.println(telegramMessage.getTitle() + "отправлено!!!");
                                 }
+
                             }
                         }
                     }

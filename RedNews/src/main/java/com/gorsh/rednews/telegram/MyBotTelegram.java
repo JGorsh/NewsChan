@@ -116,6 +116,7 @@ public class MyBotTelegram extends TelegramLongPollingBot{
                     person.setDistribution(true);
                     personService.save(person);
                     message.setText("Бот запущен!");
+                    userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.DEFAULT);
                     System.out.println("run");
                     break;
 
@@ -127,7 +128,7 @@ public class MyBotTelegram extends TelegramLongPollingBot{
                 //не отреагирует на стоп
                 case STOP:
                     message.setText("Бот остановлен! ");
-                    userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.DEFAULT);
+                    //userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.STOP);
                     person = personService.getByChatId(chatId);
                     person.setDistribution(false);
                     personService.save(person);
