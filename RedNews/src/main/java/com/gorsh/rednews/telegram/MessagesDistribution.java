@@ -1,8 +1,9 @@
-package com.gorsh.rednews.service;
+package com.gorsh.rednews.telegram;
 
 import com.gorsh.rednews.entities.ChannelReddit;
 import com.gorsh.rednews.entities.Person;
 import com.gorsh.rednews.entities.TelegramMessage;
+import com.gorsh.rednews.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -39,13 +40,14 @@ public class MessagesDistribution implements Runnable{
                             List<TelegramMessage> telegramMessageList = channelReddit.getMessages();
 
                             for (TelegramMessage telegramMessage : telegramMessageList) {
-                                body = new LinkedMultiValueMap<String, String>();
+                                body = new LinkedMultiValueMap<>();
                                 handlerMsgRdt(person, telegramMessage, body);
                                 HttpEntity<Object> request = new HttpEntity<>(body, headers);
                                 System.out.println(telegramMessage);
                                 System.out.println(request);
                                 try {
-                                    ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
+                                    //ResponseEntity<String> response =
+                                    restTemplate.postForEntity(apiUrl, request, String.class);
                                     //System.out.println(response.getBody());
                                 } catch (Exception e) {
                                     e.printStackTrace();

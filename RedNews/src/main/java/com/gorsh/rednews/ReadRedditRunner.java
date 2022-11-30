@@ -1,7 +1,7 @@
 package com.gorsh.rednews;
 
 import com.gorsh.rednews.reddit.RedditService;
-import com.gorsh.rednews.service.MessagesDistribution;
+import com.gorsh.rednews.telegram.MessagesDistribution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

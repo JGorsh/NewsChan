@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 //маппинг списка ответов сабреддита и сохранение в бд
@@ -71,10 +72,12 @@ public class TelegramMessageHandler {
             telegramMessage.setTitle(objNode.get("data").get("title").asText());
             telegramMessage.setUrlMedia(objNode.get("data").get("media").get("reddit_video").get("fallback_url").asText());
             telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
+            telegramMessage.setDate(new Date());
         } else {
             telegramMessage.setTitle(objNode.get("data").get("title").asText());
             telegramMessage.setUrlMedia(objNode.get("data").get("url").asText());
             telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
+            telegramMessage.setDate(new Date());
         }
     }
 }
