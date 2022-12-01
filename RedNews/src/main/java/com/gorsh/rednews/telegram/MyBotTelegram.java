@@ -87,7 +87,6 @@ public class MyBotTelegram extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         String chatId = "";
         String userName;
-
         if (update.hasMessage()) {
             person = new Person();
             chatId = update.getMessage().getChatId().toString();
@@ -118,14 +117,14 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
                 case START:
                     subreddit = update.getMessage().getText();
-                    if (isSubreddit(redditService, subreddit)) {
+                    if (isSubreddit(redditService, subreddit) && isExistSubreddit(chatId, subreddit)) {
                         message.setText("Выберите фильтр для " + update.getMessage().getText());
                         message.setReplyMarkup(getInlineMessageButtonFilter());
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.FILTER);
                         System.out.println("start");
                     } else {
-                        message.setText("Такого subreddit не существует! \nВведите другой subreddit!");
-                        System.out.println("Такого subreddit не существует! \nВведите другой subreddit!");
+                        message.setText("Такого subreddit не существует (либо вы уже подписаны)! \nВведите другой subreddit!");
+                        System.out.println("Такого subreddit не существует (либо вы уже подписаны)! \nВведите другой subreddit!");
                     }
 
                     break;
@@ -275,6 +274,17 @@ public class MyBotTelegram extends TelegramLongPollingBot {
             str.append(subreddit + " (" + filter + ")\n");
         }
         return str.toString();
+    }
+
+    private boolean isExistSubreddit (String chatId, String subreddit){
+        Person person = personService.getByChatId(chatId);
+        List<ChannelReddit> channelRedditList = person.getSubreddits();
+        for(ChannelReddit ch : channelRedditList){
+            if(ch.getSubreddit().equals(subreddit)){
+            return false;
+            }
+        }
+        return true;
     }
 }
 
