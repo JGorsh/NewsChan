@@ -99,6 +99,7 @@ public class MyBotTelegram extends TelegramLongPollingBot{
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             TelegramStatus telegramStatus = userStatusCache.getUsersCurrentTelegramStatus(chatId);
+            String text = update.getMessage().getText();
             switch (telegramStatus) {
                 case START :
                     subreddit = update.getMessage().getText();
