@@ -142,7 +142,6 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                     } else {
                         message.setText("Неверная команда " + text);
                     }
-
                     break;
 
                 case RUNNING:
@@ -151,14 +150,14 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         person.setDistribution(false);
                         personService.save(person);
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUN);
-                        message.setText("Бот остановлен! \n Для запуска введите команду /start");
+                        message.setText("Бот остановлен! \n Для запуска введите команду /run");
                         System.out.println("stop");
                     }
-                    if (text.equals("/update")) {
+                    else if (text.equals("/update")) {
                         message.setText("Введите отслеживаемый subreddit ");
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
                     }
-                    if (text.equals("/list")){
+                    else if (text.equals("/list")){
                         message.setText(getListSubreddit(chatId));
                     }
                     else {
@@ -192,6 +191,9 @@ public class MyBotTelegram extends TelegramLongPollingBot {
             }
         }
         try {
+            if(message.getText()==null){
+                message.setText("Некорректный ввод");
+            }
             execute(message); // Call method to send the message
         } catch (TelegramApiException e) {
             e.printStackTrace();
@@ -242,7 +244,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
     private void setTextMessageFilterAndSubreddit(String subreddit, String filter, SendMessage message) {
         message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром " + filter + "\n" +
-                "Для запуска ленты введите команду /run");
+                "Для включения подписки в ленту введите команду /run");
     }
 
     private boolean isSubreddit(RedditService redditService, String subreddit) {
