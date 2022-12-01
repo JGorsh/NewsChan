@@ -8,5 +8,6 @@ public enum TelegramStatus {
     UPDATE,
     FILTER,
     FAULT,
-    DEFAULT
+    DEFAULT,
+    SUBREDDIT
 }

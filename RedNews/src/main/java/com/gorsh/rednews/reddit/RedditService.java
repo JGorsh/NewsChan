@@ -48,7 +48,7 @@ public class RedditService implements Runnable{
         }
     }
     //получение токена доступа к апи
-    public String getAuthToken(){
+    public synchronized String getAuthToken(){
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth("YIs2-_3udGw-RmaGqkj94w", "Gm2TKpV2_YZLWcBU-oh6l44vRiHj-w");
@@ -71,7 +71,7 @@ public class RedditService implements Runnable{
     }
 
     //получения списка body response по списку сабреддитов учитывая фильтр
-    public List<String> readArticles(String authToken, List<ChannelReddit> subreddits){
+    public synchronized List<String> readArticles(String authToken, List<ChannelReddit> subreddits){
         List<String> bodyResponseList = new ArrayList<>();
         ResponseEntity<String> response;
         RestTemplate restTemplate = new RestTemplate();

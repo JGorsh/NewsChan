@@ -1,6 +1,9 @@
 package com.gorsh.rednews.telegram;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gorsh.rednews.entities.ChannelReddit;
 import com.gorsh.rednews.entities.Person;
 import com.gorsh.rednews.entities.TelegramMessage;
@@ -13,7 +16,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -23,13 +28,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @Component
-public class MyBotTelegram extends TelegramLongPollingBot{
+public class MyBotTelegram extends TelegramLongPollingBot {
 
     private String subreddit;
 
@@ -41,10 +47,10 @@ public class MyBotTelegram extends TelegramLongPollingBot{
 
     private TelegramMessage telegramMessage;
 
-    private RedditService redditService;
-
     private TelegramStatus telegramStatus;
 
+    @Autowired
+    private RedditService redditService;
     @Autowired
     PersonService personService;
 
@@ -81,6 +87,7 @@ public class MyBotTelegram extends TelegramLongPollingBot{
         SendMessage message = new SendMessage();
         String chatId = "";
         String userName;
+
         if (update.hasMessage()) {
             person = new Person();
             chatId = update.getMessage().getChatId().toString();
@@ -95,18 +102,32 @@ public class MyBotTelegram extends TelegramLongPollingBot{
             message.setChatId(chatId);
         }
 
-        redditService = new RedditService();
-
         if (update.hasMessage() && update.getMessage().hasText()) {
             TelegramStatus telegramStatus = userStatusCache.getUsersCurrentTelegramStatus(chatId);
             String text = update.getMessage().getText();
             switch (telegramStatus) {
-                case START :
+                case DEFAULT:
+                    if (text.equals("/start")) {
+                        message.setText("Введите отслеживаемый subreddit ");
+                        userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
+                    } else {
+                        message.setText("Неверная команда " + text);
+                    }
+                    System.out.println("default");
+                    break;
+
+                case START:
                     subreddit = update.getMessage().getText();
-                    message.setText("Выберите фильтр для " + update.getMessage().getText());
-                    message.setReplyMarkup(getInlineMessageButtonFilter());
-                    userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.FILTER);
-                    System.out.println("start");
+                    if (isSubreddit(redditService, subreddit)) {
+                        message.setText("Выберите фильтр для " + update.getMessage().getText());
+                        message.setReplyMarkup(getInlineMessageButtonFilter());
+                        userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUN);
+                        System.out.println("start");
+                    } else {
+                        message.setText("Такого subreddit не существует! \n Введите другой subreddit!");
+                        System.out.println("Такого subreddit не существует! \n Введите другой subreddit!");
+                    }
+
                     break;
 
                 case RUN:
@@ -118,11 +139,6 @@ public class MyBotTelegram extends TelegramLongPollingBot{
                     System.out.println("run");
                     break;
 
-                case DEFAULT:
-                    message.setText("Введите отслеживаемый subreddit ");
-                    userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
-                    System.out.println("default");
-                    break;
                 //не отреагирует на стоп
                 case STOP:
                     message.setText("Бот остановлен! ");
@@ -207,6 +223,27 @@ public class MyBotTelegram extends TelegramLongPollingBot{
         message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром " + filter + "\n" +
                 "Для запуска ленты введите команду /run" + "\n" +
                 "Для остановки ленты введите команду /stop");
+    }
+
+    private boolean isSubreddit(RedditService redditService, String subreddit) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ResponseEntity<String> response;
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(redditService.getAuthToken());
+        headers.put("User-Agent", Collections.singletonList("myApp:V0.1"));
+        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+        String url = "https://oauth.reddit.com/r/" + subreddit + "/" + "?limit=1";
+
+        try {
+            restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
     }
 }
 
