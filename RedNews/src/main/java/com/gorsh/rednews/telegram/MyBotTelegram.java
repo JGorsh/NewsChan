@@ -121,32 +121,54 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                     if (isSubreddit(redditService, subreddit)) {
                         message.setText("Выберите фильтр для " + update.getMessage().getText());
                         message.setReplyMarkup(getInlineMessageButtonFilter());
-                        userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUN);
+                        userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.FILTER);
                         System.out.println("start");
                     } else {
-                        message.setText("Такого subreddit не существует! \n Введите другой subreddit!");
-                        System.out.println("Такого subreddit не существует! \n Введите другой subreddit!");
+                        message.setText("Такого subreddit не существует! \nВведите другой subreddit!");
+                        System.out.println("Такого subreddit не существует! \nВведите другой subreddit!");
                     }
 
                     break;
 
                 case RUN:
-                    person = personService.getByChatId(chatId);
-                    person.setDistribution(true);
-                    personService.save(person);
-                    message.setText("Бот запущен!");
-                    userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.DEFAULT);
-                    System.out.println("run");
+                    if (text.equals("/run")) {
+                        person = personService.getByChatId(chatId);
+                        person.setDistribution(true);
+                        personService.save(person);
+                        message.setText("Бот запущен! \nДля остановки ленты введите команду /stop " +
+                                "\nДля добавления новых подписок введите команду /update" +
+                                "\nДля получения списка подписок введите команду /list");
+                        userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUNNING);
+                        System.out.println("run");
+                    } else {
+                        message.setText("Неверная команда " + text);
+                    }
+
                     break;
 
-                //не отреагирует на стоп
-                case STOP:
-                    message.setText("Бот остановлен! ");
-                    //userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.STOP);
-                    person = personService.getByChatId(chatId);
-                    person.setDistribution(false);
-                    personService.save(person);
-                    System.out.println("stop");
+                case RUNNING:
+                    if (text.equals("/stop")) {
+                        person = personService.getByChatId(chatId);
+                        person.setDistribution(false);
+                        personService.save(person);
+                        userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUN);
+                        message.setText("Бот остановлен! \n Для запуска введите команду /start");
+                        System.out.println("stop");
+                    }
+                    if (text.equals("/update")) {
+                        message.setText("Введите отслеживаемый subreddit ");
+                        userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
+                    }
+                    if (text.equals("/list")){
+                        message.setText(getListSubreddit(chatId));
+                    }
+                    else {
+                        message.setText("Неверная команда " + text);
+                    }
+                    break;
+
+                case DELETE:
+
                     break;
             }
         }
@@ -221,13 +243,10 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
     private void setTextMessageFilterAndSubreddit(String subreddit, String filter, SendMessage message) {
         message.setText("Ваш отслеживаемый subreddit " + subreddit + " с фильтром " + filter + "\n" +
-                "Для запуска ленты введите команду /run" + "\n" +
-                "Для остановки ленты введите команду /stop");
+                "Для запуска ленты введите команду /run");
     }
 
     private boolean isSubreddit(RedditService redditService, String subreddit) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ResponseEntity<String> response;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -244,6 +263,18 @@ public class MyBotTelegram extends TelegramLongPollingBot {
         }
 
         return true;
+    }
+
+    private String getListSubreddit(String chatId){
+        Person person = personService.getByChatId(chatId);
+        List<ChannelReddit> channelRedditList = person.getSubreddits();
+        StringBuilder str = new StringBuilder();
+        for(ChannelReddit ch : channelRedditList){
+            String subreddit = ch.getSubreddit();
+            String filter = ch.getChannelFilter();
+            str.append(subreddit + " (" + filter + ")\n");
+        }
+        return str.toString();
     }
 }
 
