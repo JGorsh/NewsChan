@@ -15,6 +15,7 @@ import com.gorsh.rednews.service.TelegramMessageService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@Log4j
 @Component
 public class MyBotTelegram extends TelegramLongPollingBot {
 
@@ -93,7 +95,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
             userName = update.getMessage().getFrom().getUserName();
             person.setChatId(chatId);
             person.setUserName(userName);
-            System.out.println(person.getChatId() + " " + person.getUserName());
+            log.debug(person.getChatId() + " " + person.getUserName());
             message.setChatId(chatId);
         }
         if (update.hasCallbackQuery()) {
@@ -121,7 +123,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         message.setText("Выберите фильтр для " + update.getMessage().getText());
                         message.setReplyMarkup(getInlineMessageButtonFilter());
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.FILTER);
-                        System.out.println("start");
+                        log.debug(chatId + "start");
                     } else {
                         message.setText("Такого subreddit не существует (либо вы уже подписаны)! \nВведите другой subreddit!");
                         System.out.println("Такого subreddit не существует (либо вы уже подписаны)! \nВведите другой subreddit!");
@@ -139,7 +141,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                                 "\nДля получения списка подписок введите команду /list" +
                                 "\nДля удаления подписки введите команду /delete");
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUNNING);
-                        System.out.println("run");
+                        log.debug(chatId + "run");
                     } else {
                         message.setText("Неверная команда " + text);
                     }
@@ -152,14 +154,16 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         personService.save(person);
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUN);
                         message.setText("Бот остановлен! \n Для запуска введите команду /run");
-                        System.out.println("stop");
+                        log.debug(chatId + "stop");
                     }
                     else if (text.equals("/update")) {
                         message.setText("Введите отслеживаемый subreddit ");
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
+                        log.debug(chatId + "update");
                     }
                     else if (text.equals("/list")){
                         message.setText(getListSubreddit(chatId));
+                        log.debug(chatId + "list");
                     }
                     else if (text.equals("/delete")){
 

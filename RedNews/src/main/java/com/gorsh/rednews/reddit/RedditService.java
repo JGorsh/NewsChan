@@ -7,6 +7,7 @@ import com.gorsh.rednews.handlers.TelegramMessageHandler;
 import com.gorsh.rednews.service.ChannelRedditService;
 import com.gorsh.rednews.service.PersonService;
 import com.gorsh.rednews.service.TelegramMessageService;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Component
+@Log4j
 public class RedditService implements Runnable{
 
     @Autowired
@@ -37,7 +39,7 @@ public class RedditService implements Runnable{
             if(channelRedditList!=null){
                 List<String> bodyListResponse = readArticles(getAuthToken(),channelRedditList);
                 telegramMessageHandler.telegramMessageMarshaling(bodyListResponse, channelRedditList);
-                System.out.println("Update");
+                log.debug("UPDATE!!!");
             }
             try {
                 //задержка запросов апи реддита
@@ -83,7 +85,7 @@ public class RedditService implements Runnable{
         if (subreddits!=null){
             for(ChannelReddit ch : subreddits){
                 String url = "https://oauth.reddit.com/r/" + ch.getSubreddit() + "/" + ch.getChannelFilter() + "?limit=1";
-                System.out.println(ch.getSubreddit());
+                log.debug(ch.getSubreddit());
                 response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
                 bodyResponseList.add(response.getBody());
 

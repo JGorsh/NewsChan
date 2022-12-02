@@ -4,6 +4,9 @@ import com.gorsh.rednews.entities.ChannelReddit;
 import com.gorsh.rednews.entities.Person;
 import com.gorsh.rednews.entities.TelegramMessage;
 import com.gorsh.rednews.service.PersonService;
+
+import lombok.extern.log4j.Log4j;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Component
+@Log4j
 public class MessagesDistribution implements Runnable{
 
     @Autowired
@@ -53,7 +57,8 @@ public class MessagesDistribution implements Runnable{
                                     }
                                     telegramMessage.setSent(true);
                                     personService.save(person);
-                                    System.out.println(telegramMessage.getTitle() + "\n отправлено!!!");
+                                    log.debug(telegramMessage.getTitle());
+//                                    System.out.println(telegramMessage.getTitle() + "\n отправлено!!!");
                                 }
 
                             }
