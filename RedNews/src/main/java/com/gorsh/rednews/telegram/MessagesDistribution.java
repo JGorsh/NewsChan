@@ -6,7 +6,6 @@ import com.gorsh.rednews.entities.TelegramMessage;
 import com.gorsh.rednews.service.PersonService;
 
 import lombok.extern.log4j.Log4j;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

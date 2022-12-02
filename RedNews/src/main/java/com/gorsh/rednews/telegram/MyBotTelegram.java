@@ -114,7 +114,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                     } else {
                         message.setText("Неверная команда " + text);
                     }
-                    System.out.println("default");
+                    log.debug(chatId + "default");
                     break;
 
                 case START:
@@ -126,7 +126,6 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         log.debug(chatId + "start");
                     } else {
                         message.setText("Такого subreddit не существует (либо вы уже подписаны)! \nВведите другой subreddit!");
-                        System.out.println("Такого subreddit не существует (либо вы уже подписаны)! \nВведите другой subreddit!");
                     }
 
                     break;
