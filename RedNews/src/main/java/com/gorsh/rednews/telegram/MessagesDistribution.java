@@ -47,8 +47,6 @@ public class MessagesDistribution implements Runnable{
                                     body = new LinkedMultiValueMap<>();
                                     handlerMsgRdt(person, telegramMessage, body, subreddit);
                                     HttpEntity<Object> request = new HttpEntity<>(body, headers);
-                                    System.out.println(telegramMessage);
-                                    System.out.println(request);
                                     try {
                                         restTemplate.postForEntity(apiUrl, request, String.class);
                                     } catch (Exception e) {
@@ -57,10 +55,8 @@ public class MessagesDistribution implements Runnable{
                                     }
                                     telegramMessage.setSent(true);
                                     personService.save(person);
-                                    log.debug(telegramMessage.getTitle());
-//                                    System.out.println(telegramMessage.getTitle() + "\n отправлено!!!");
+                                    log.debug(telegramMessage.getTitle() + "-->" + person.getChatId());
                                 }
-
                             }
                         }
                     }
