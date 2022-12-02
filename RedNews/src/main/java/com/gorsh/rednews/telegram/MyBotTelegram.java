@@ -136,7 +136,8 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         personService.save(person);
                         message.setText("Бот запущен! \nДля остановки ленты введите команду /stop " +
                                 "\nДля добавления новых подписок введите команду /update" +
-                                "\nДля получения списка подписок введите команду /list");
+                                "\nДля получения списка подписок введите команду /list" +
+                                "\nДля удаления подписки введите команду /delete");
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUNNING);
                         System.out.println("run");
                     } else {
@@ -160,13 +161,13 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                     else if (text.equals("/list")){
                         message.setText(getListSubreddit(chatId));
                     }
+                    else if (text.equals("/delete")){
+
+                        message.setText("");
+                    }
                     else {
                         message.setText("Неверная команда " + text);
                     }
-                    break;
-
-                case DELETE:
-
                     break;
             }
         }
@@ -280,11 +281,15 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
     private boolean isExistSubreddit (String chatId, String subreddit){
         Person person = personService.getByChatId(chatId);
-        List<ChannelReddit> channelRedditList = person.getSubreddits();
-        for(ChannelReddit ch : channelRedditList){
-            if(ch.getSubreddit().equals(subreddit)){
-            return false;
+        try {
+            List<ChannelReddit> channelRedditList = person.getSubreddits();
+            for(ChannelReddit ch : channelRedditList){
+                if(ch.getSubreddit().equals(subreddit)){
+                    return false;
+                }
             }
+        } catch (Exception e){
+            return true;
         }
         return true;
     }
