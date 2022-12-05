@@ -114,7 +114,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                     } else {
                         message.setText("Неверная команда " + text);
                     }
-                    log.debug(chatId + "default");
+                    log.debug(chatId + " default");
                     break;
 
                 case START:
@@ -123,7 +123,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         message.setText("Выберите фильтр для " + update.getMessage().getText());
                         message.setReplyMarkup(getInlineMessageButtonFilter());
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.FILTER);
-                        log.debug(chatId + "start");
+                        log.debug(chatId + " start");
                     } else {
                         message.setText("Такого subreddit не существует (либо вы уже подписаны)! \nВведите другой subreddit!");
                     }
@@ -140,7 +140,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                                 "\nДля получения списка подписок введите команду /list" +
                                 "\nДля удаления подписки введите команду /delete");
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUNNING);
-                        log.debug(chatId + "run");
+                        log.debug(chatId + " run");
                     } else {
                         message.setText("Неверная команда " + text);
                     }
@@ -153,16 +153,16 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         personService.save(person);
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUN);
                         message.setText("Бот остановлен! \n Для запуска введите команду /run");
-                        log.debug(chatId + "stop");
+                        log.debug(chatId + " stop");
                     }
                     else if (text.equals("/update")) {
                         message.setText("Введите отслеживаемый subreddit ");
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.START);
-                        log.debug(chatId + "update");
+                        log.debug(chatId + " update");
                     }
                     else if (text.equals("/list")){
                         message.setText(getListSubreddit(chatId));
-                        log.debug(chatId + "list");
+                        log.debug(chatId + " list");
                     }
                     else if (text.equals("/delete")){
 
@@ -189,9 +189,11 @@ public class MyBotTelegram extends TelegramLongPollingBot {
             if (personData == null) {
                 person.getSubreddits().add(channelReddit);
                 personService.save(person);
+                log.debug(chatId + channelReddit.getSubreddit());
             } else {
                 personData.getSubreddits().add(channelReddit);
                 personService.save(personData);
+                log.debug(chatId + channelReddit.getSubreddit());
             }
         }
         try {
