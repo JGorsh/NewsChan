@@ -54,7 +54,7 @@ public class MessagesDistribution implements Runnable{
                                     }
                                     telegramMessage.setSent(true);
                                     personService.save(person);
-                                    log.debug(telegramMessage.getTitle() + "-->" + person.getChatId());
+                                    log.debug(person.getChatId() +  "-->" + telegramMessage.getTitle());
                                 }
                             }
                         }

@@ -19,7 +19,7 @@ public class TelegramMessage {
     @JsonIgnore
     private Long id;
 
-    @Column
+    @Column (columnDefinition = "varchar(500)")
     private String title;
 
     @Column
