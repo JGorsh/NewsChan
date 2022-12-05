@@ -16,7 +16,7 @@ public class ReadRedditRunner implements CommandLineRunner{
     MessagesDistribution messagesDistribution;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args){
 
 //        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
 //        DefaultBotOptions botOptions = new DefaultBotOptions();
