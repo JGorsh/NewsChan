@@ -18,14 +18,6 @@ public class ReadRedditRunner implements CommandLineRunner{
     @Override
     public void run(String... args){
 
-//        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-//        DefaultBotOptions botOptions = new DefaultBotOptions();
-//        botOptions.setProxyHost("proxy.orb.ru");
-//        botOptions.setProxyPort(3128);
-//        botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
-//        WriteReadBot bot = new WriteReadBot(botOptions);
-//        botsApi.registerBot(bot);
-
         System.setProperty("https.proxyHost", "proxy.orb.ru");
         System.setProperty("https.proxyPort", "3128");
 
