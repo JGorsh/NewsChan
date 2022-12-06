@@ -165,13 +165,17 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         log.debug(chatId + " list");
                     }
                     else if (text.equals("/delete")){
-
-                        message.setText("");
+                        message.setText("Введите subreddit для удаления из вашей ленты!");
+                        userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.DELETE);
+                        log.debug(chatId + " delete");
                     }
                     else {
                         message.setText("Неверная команда " + text);
                     }
                     break;
+
+                case DELETE:
+
             }
         }
 

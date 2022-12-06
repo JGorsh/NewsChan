@@ -25,4 +25,8 @@ public class ChannelRedditService {
         return channelRedditRepository.getChannelRedditBySubreddit(subreddit);
     }
 
+    public void deleteChannelRedditById(Long id){
+        channelRedditRepository.deleteById(id);
+    }
+
 }
