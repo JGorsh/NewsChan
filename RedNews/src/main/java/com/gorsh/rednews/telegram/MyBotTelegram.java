@@ -175,7 +175,14 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                     break;
 
                 case DELETE:
-
+                    try{
+                        ChannelReddit channelReddit = channelRedditService.getChannelRedditBySubreddit(text);
+                        channelRedditService.deleteChannelRedditById(channelReddit.getId());
+                        message.setText("Subreddit " + text + " удален из вашей ленты!");
+                        userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUNNING);
+                    } catch (Exception e){
+                        message.setText("Вы не были подписаны на " + text + " \nВведите другой subreddit!");
+                    }
             }
         }
 

@@ -7,4 +7,5 @@ public interface ChannelRedditRepository extends JpaRepository<ChannelReddit, Lo
 
     ChannelReddit getChannelRedditBySubreddit(String subreddit);
 
+
 }

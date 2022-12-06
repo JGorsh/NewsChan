@@ -100,7 +100,7 @@ public class MessagesDistribution implements Runnable{
     }
 
     @Override
-    @Scheduled(fixedDelay = 3600000)
+    @Scheduled(fixedDelay = 10000)
     public void run() {
         onTelegramDistribution("5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g");
     }
