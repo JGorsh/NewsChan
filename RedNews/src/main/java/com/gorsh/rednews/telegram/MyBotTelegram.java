@@ -89,6 +89,8 @@ public class MyBotTelegram extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         String chatId = "";
         String userName;
+        String text = "";
+
         if (update.hasMessage()) {
             person = new Person();
             chatId = update.getMessage().getChatId().toString();
@@ -97,6 +99,12 @@ public class MyBotTelegram extends TelegramLongPollingBot {
             person.setUserName(userName);
             log.debug(person.getChatId() + " " + person.getUserName());
             message.setChatId(chatId);
+            text = update.getMessage().getText();
+
+//            if(text.equals("/reset")){
+//                userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUN);
+//                message.setText("Прогресс чата сброшен, бот остановлен, для начала работы нажмите /run ");
+//            }
         }
         if (update.hasCallbackQuery()) {
             chatId = update.getCallbackQuery().getMessage().getChatId().toString();
@@ -105,7 +113,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             TelegramStatus telegramStatus = userStatusCache.getUsersCurrentTelegramStatus(chatId);
-            String text = update.getMessage().getText();
+
             switch (telegramStatus) {
                 case DEFAULT:
                     if (text.equals("/start")) {
@@ -138,7 +146,8 @@ public class MyBotTelegram extends TelegramLongPollingBot {
                         message.setText("Бот запущен! \nДля остановки ленты введите команду /stop " +
                                 "\nДля добавления новых подписок введите команду /update" +
                                 "\nДля получения списка подписок введите команду /list" +
-                                "\nДля удаления подписки введите команду /delete");
+                                "\nДля удаления подписки введите команду /delete" +
+                                "\nДля сброса статуса чата введите команду /reset");
                         userStatusCache.setUsersCurrentTelegramStatus(chatId, TelegramStatus.RUNNING);
                         log.debug(chatId + " run");
                     } else {
