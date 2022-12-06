@@ -43,7 +43,7 @@ public class RedditService implements Runnable{
             }
             try {
                 //задержка запросов апи реддита
-                Thread.sleep(300000);
+                Thread.sleep(900000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
