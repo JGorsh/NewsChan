@@ -79,5 +79,6 @@ public class TelegramMessageHandler {
             telegramMessage.setUrlPost(objNode.get("data").get("permalink").asText());
             telegramMessage.setDate(new Date());
         }
+        //String selftext = objNode.get("data").get("selftext").asText();
     }
 }
