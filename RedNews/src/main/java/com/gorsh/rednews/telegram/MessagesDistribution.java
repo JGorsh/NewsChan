@@ -7,6 +7,7 @@ import com.gorsh.rednews.service.PersonService;
 
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,13 +22,19 @@ import java.util.List;
 @Log4j
 public class MessagesDistribution implements Runnable{
 
+    @Value("${configs.telegrambot.apiUrl}")
+    String apiUrl;
+
+    @Value("${configs.telegrambot.botToken}")
+    String botToken;
+
     @Autowired
     PersonService personService;
 
     //обработать похожие сообщения
     private void onTelegramDistribution(String botToken){
 
-        String apiUrl = "https://api.telegram.org/bot" + botToken + "/sendMessage";
+        String apiUrl1 = apiUrl + botToken + "/sendMessage";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         MultiValueMap<String, String> body;
@@ -47,7 +54,7 @@ public class MessagesDistribution implements Runnable{
                                     handlerMsgRdt(person, telegramMessage, body, subreddit);
                                     HttpEntity<Object> request = new HttpEntity<>(body, headers);
                                     try {
-                                        restTemplate.postForEntity(apiUrl, request, String.class);
+                                        restTemplate.postForEntity(apiUrl1, request, String.class);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                         continue;
@@ -102,6 +109,6 @@ public class MessagesDistribution implements Runnable{
     @Override
     @Scheduled(fixedDelay = 10000)
     public void run() {
-        onTelegramDistribution("5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g");
+        onTelegramDistribution(botToken);
     }
 }

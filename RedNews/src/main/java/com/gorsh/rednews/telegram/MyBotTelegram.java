@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -39,6 +40,14 @@ import java.util.List;
 @Component
 public class MyBotTelegram extends TelegramLongPollingBot {
 
+    @Value("${configs.telegrambot.botToken}")
+    String botToken;
+
+    @Value("${configs.reddit.requestUrl}")
+    String requestUrl;
+
+    @Value("${configs.telegrambot.userName}")
+    String userName;
     private String subreddit;
 
     private String filter;
@@ -76,12 +85,12 @@ public class MyBotTelegram extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "RedditNewsChannelBot";
+        return userName;
     }
 
     @Override
     public String getBotToken() {
-        return "5636275218:AAGij5CRWKFgOJW5BJ4inMxn5VuepfZb--g";
+        return botToken;
     }
 
     @Override
@@ -280,7 +289,7 @@ public class MyBotTelegram extends TelegramLongPollingBot {
         headers.setBearerAuth(redditService.getAuthToken());
         headers.put("User-Agent", Collections.singletonList("myApp:V0.1"));
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-        String url = "https://oauth.reddit.com/r/" + subreddit + "/" + "?limit=1";
+        String url = requestUrl + subreddit + "/" + "?limit=1";
 
         try {
             restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
