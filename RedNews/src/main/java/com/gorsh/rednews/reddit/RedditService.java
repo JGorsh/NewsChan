@@ -9,6 +9,7 @@ import com.gorsh.rednews.service.PersonService;
 import com.gorsh.rednews.service.TelegramMessageService;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -19,6 +20,24 @@ import java.util.*;
 @Component
 @Log4j
 public class RedditService implements Runnable{
+
+    @Value("${configs.reddit.clientId}")
+    String clientId;
+
+    @Value("${configs.reddit.secret}")
+    String secret;
+
+    @Value("${configs.reddit.accsessTokenUrl}")
+    String accsessTokenUrl;
+
+    @Value("${configs.reddit.requestUrl}")
+    String requestUrl;
+
+    @Value("${configs.reddit.limit}")
+    String limit;
+
+    @Value("${configs.reddit.apiRequestTimeout}")
+    int apiRequestTimeout;
 
     @Autowired
     PersonService personService;
@@ -53,13 +72,13 @@ public class RedditService implements Runnable{
     public synchronized String getAuthToken(){
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth("YIs2-_3udGw-RmaGqkj94w", "Gm2TKpV2_YZLWcBU-oh6l44vRiHj-w");
+        headers.setBasicAuth(clientId, secret);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.put("User-Agent", Collections.singletonList("myApp:V0.1"));
 
         String body = "grant_type=client_credentials";
         HttpEntity<String> request = new HttpEntity<>(body, headers);
-        String authUrl = "https://www.reddit.com/api/v1/access_token";
+        String authUrl = accsessTokenUrl;
         ResponseEntity<String> response = restTemplate.postForEntity(authUrl, request, String.class);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -84,13 +103,13 @@ public class RedditService implements Runnable{
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         if (subreddits!=null){
             for(ChannelReddit ch : subreddits){
-                String url = "https://oauth.reddit.com/r/" + ch.getSubreddit() + "/" + ch.getChannelFilter() + "?limit=1";
+                String url = requestUrl + ch.getSubreddit() + "/" + ch.getChannelFilter() + limit;
                 log.debug(ch.getSubreddit());
                 response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
                 bodyResponseList.add(response.getBody());
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(apiRequestTimeout);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
