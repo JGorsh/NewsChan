@@ -39,6 +39,9 @@ public class RedditService implements Runnable{
     @Value("${configs.reddit.apiRequestTimeout}")
     int apiRequestTimeout;
 
+    @Value("${configs.reddit.allRequestTimeout}")
+    int allRequestTimeout;
+
     @Autowired
     PersonService personService;
 
@@ -62,7 +65,7 @@ public class RedditService implements Runnable{
             }
             try {
                 //задержка запросов апи реддита
-                Thread.sleep(10000);
+                Thread.sleep(allRequestTimeout);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
